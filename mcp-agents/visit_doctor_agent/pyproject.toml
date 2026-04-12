@@ -14,6 +14,9 @@ dependencies = [
 
 [project.scripts]
 visit_doctor_agent = "main:run"
+inspector = "main:run_inspector"
+# Add mockup data to DB for clinical history
+seed_clinical_history = "seeds.seed_clinical_history:run"
 
 [build-system]
 requires = ["hatchling"]

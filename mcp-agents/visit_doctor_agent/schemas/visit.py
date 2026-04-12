@@ -1,6 +1,5 @@
 from datetime import date
 from enum import Enum
-from typing import Optional
 from typing_extensions import Annotated
 from pydantic import BaseModel, Field, field_validator, AfterValidator
 
@@ -18,7 +17,7 @@ class DoctorType(str, Enum):
 
 def validate_not_past(visit_at: date) -> date:
     if visit_at > date.today():
-        raise ValueError("date must be today or future")
+        raise ValueError("date must be today or past")
     return visit_at
 
 DateVisit = Annotated[
@@ -42,9 +41,3 @@ class DoctorVisit(BaseModel):
         default="",
         description="ISO 8601 timestamp when the record was created."
     )
-    @field_validator("visit_at")
-    @classmethod
-    def date_visit_not_in_past(cls, visit_at: date) -> date:
-        if visit_at < date.today():
-            raise ValueError(f"visit_at must be today or in the future, got {visit_at}")
-        return visit_at

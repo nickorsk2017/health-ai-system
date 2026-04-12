@@ -19,6 +19,9 @@ class Settings(BaseSettings):
 
     database_url: str | None = None
 
+    mcp_port: int = 6332
+    mcp_host: str = "0.0.0.0"
+
 
 
 settings = Settings()

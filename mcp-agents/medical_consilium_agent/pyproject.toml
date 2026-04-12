@@ -1,0 +1,22 @@
+[project]
+name = "medical_consilium_agent"
+version = "0.1.0"
+description = "MCP orchestrator that runs a patient's history through a board of 9 specialist LLMs in parallel."
+requires-python = ">=3.12"
+dependencies = [
+    "fastmcp>=2.0.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "langchain-openai>=0.1.0",
+    "loguru>=0.7.0",
+]
+
+[project.scripts]
+medical_consilium_agent = "main:run"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]

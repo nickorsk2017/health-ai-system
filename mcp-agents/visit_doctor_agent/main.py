@@ -5,12 +5,14 @@ from typing import AsyncIterator
 from fastmcp import FastMCP
 from loguru import logger
 
+from config import settings
 from db.init import create_tables
 from schemas.visit import  DoctorVisit
 from schemas.http import GetDoctorVisitsHistoryRequest
 from tools.get_doctor_visits_history import get_doctor_visits_history as _get_history
 from tools.add_visit_doctor import add_visit_doctor as _record_visit
 
+logger.add("mcp.log", rotation="10 MB")
 
 @asynccontextmanager
 async def lifespan(server: FastMCP) -> AsyncIterator[None]:
@@ -67,6 +69,9 @@ async def get_doctor_visits_history(
 
 
 def run() -> None:
+    mcp.run(transport="streamable-http", host=settings.mcp_host, port=settings.mcp_port)
+
+def run_inspector() -> None:
     mcp.run()
 
 
