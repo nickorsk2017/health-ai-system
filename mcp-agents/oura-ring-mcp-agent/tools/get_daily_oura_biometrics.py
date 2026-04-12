@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
-from openai import AsyncOpenAI
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_openai import ChatOpenAI
 
 from config import settings
 from prompts.biometrics_generation import SYSTEM_PROMPT, user_prompt
@@ -14,28 +15,27 @@ def _date_range(start: date, end: date) -> list[str]:
 
 
 async def get_daily_oura_biometrics(date_str: str, user_id: str) -> list[DailyBiometrics]:
-    start_date = date.fromisoformat(date_str)
-    today = date.today()
+    try:
+        start_date = date.fromisoformat(date_str)
+        today = date.today()
 
-    if start_date > today:
-        raise ValueError(f"start date {date_str} is in the future")
+        if start_date > today:
+            raise ValueError(f"start date {date_str} is in the future")
 
-    dates = _date_range(start_date, today)
+        dates = _date_range(start_date, today)
 
-    client = AsyncOpenAI(api_key=settings.openai_api_key)
+        llm = ChatOpenAI(
+            model=settings.openai_model,
+            api_key=settings.openai_api_key
+        )
+        structured_llm = llm.with_structured_output(GetDailyBiometricsResponse)
 
-    completion = await client.beta.chat.completions.parse(
-        model=settings.openai_model,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_prompt(user_id, dates)},
-        ],
-        response_format=GetDailyBiometricsResponse,
-        temperature=0.9,
-    )
+        response: GetDailyBiometricsResponse = await structured_llm.ainvoke([
+            SystemMessage(content=SYSTEM_PROMPT),
+            HumanMessage(content=user_prompt(user_id, dates)),
+        ])
 
-    response = completion.choices[0].message.parsed
-    if response is None:
-        raise RuntimeError("LLM returned an empty or unparseable response")
-
-    return response.records
+        return response.records
+    except Exception as e:
+        logger.exception(f"Error in get_daily_oura_biometrics: {e}")
+        raise

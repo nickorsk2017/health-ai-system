@@ -30,6 +30,7 @@ mcp-agents/
 ### General
 - Each agent is an independent MCP server. One concern per agent.
 - No shared state between tool calls. Tools are stateless functions.
+- Use langchain-openai instead openai
 
 ### schemas/
 
