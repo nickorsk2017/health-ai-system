@@ -1,7 +1,8 @@
 from datetime import date
 from enum import Enum
-
-from pydantic import BaseModel, Field, field_validator
+from typing import Optional
+from typing_extensions import Annotated
+from pydantic import BaseModel, Field, field_validator, AfterValidator
 
 
 class DoctorType(str, Enum):
@@ -15,23 +16,35 @@ class DoctorType(str, Enum):
     mental_health = "mental_health"
     pulmonology = "pulmonology"
 
+def validate_not_past(visit_at: date) -> date:
+    if visit_at > date.today():
+        raise ValueError("date must be today or future")
+    return visit_at
+
+DateVisit = Annotated[
+    date,
+    AfterValidator(validate_not_past),
+    Field(
+        description="YYYY-MM-DD, Date of the medical visit in ISO 8601 format (YYYY-MM-DD). Must be today or in the past.",
+        format="date",
+    )
+]
 
 class DoctorVisit(BaseModel):
     user_id: str = Field(description="Identifier of the patient.")
     doctor_type: DoctorType = Field(description="Medical specialty of the consulted physician.")
-    date_visit: date = Field(
-        description="ISO 8601 date of the consultation (YYYY-MM-DD)",
-        format="date"
-    )
+    visit_at: DateVisit
     subjective: str = Field(description="Patient's complaints, history, and symptoms as reported.")
     objective: str = Field(description="Clinical findings, vitals, and examination results.")
     assessment: str = Field(description="Clinical impression or diagnosis.")
-    plan: str = Field(default=None, description="Treatment plan or next steps.")
-    created_at: str | None = Field(default=None, description="ISO 8601 timestamp when the record was created.")
-
-    @field_validator("date_visit")
+    plan: str = Field(default="", description="(Optional) Treatment plan or next steps.")
+    created_at: str = Field(
+        default="",
+        description="ISO 8601 timestamp when the record was created."
+    )
+    @field_validator("visit_at")
     @classmethod
-    def date_visit_not_in_past(cls, date_visit: date) -> date:
-        if date_visit < date.today():
-            raise ValueError(f"date_visit must be today or in the future, got {date_visit}")
-        return date_visit
+    def date_visit_not_in_past(cls, visit_at: date) -> date:
+        if visit_at < date.today():
+            raise ValueError(f"visit_at must be today or in the future, got {visit_at}")
+        return visit_at

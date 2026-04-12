@@ -13,7 +13,7 @@ from schemas.visit import DoctorVisit
 async def add_visit_doctor(data: DoctorVisit) -> RecordDoctorVisitResponse:
     visit_id = uuid.uuid4()
 
-    logger.info(f"Recording visit: user={data.user_id}, specialty={data.doctor_type.value}, date={data.date_visit}")
+    logger.info(f"Recording visit: user={data.user_id}, specialty={data.doctor_type.value}, date={data.visit_at}")
 
     async with SessionLocal() as session:
         await session.execute(
@@ -21,11 +21,11 @@ async def add_visit_doctor(data: DoctorVisit) -> RecordDoctorVisitResponse:
                 id=visit_id,
                 user_id=data.user_id,
                 doctor_type=data.doctor_type.value,
-                date_visit=data.date_visit,
+                visit_at=data.visit_at,
                 subjective=data.subjective,
                 objective=data.objective,
                 assessment=data.assessment,
-                plan=data.plan,
+                plan=data.plan or "",
             )
         )
         await session.commit()

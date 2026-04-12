@@ -1,11 +1,13 @@
 from contextlib import asynccontextmanager
+from datetime import date
 from typing import AsyncIterator
 
 from fastmcp import FastMCP
 from loguru import logger
 
 from db.init import create_tables
-from schemas.visit import DoctorType, DoctorVisit
+from schemas.visit import  DoctorVisit
+from schemas.http import GetDoctorVisitsHistoryRequest
 from tools.get_doctor_visits_history import get_doctor_visits_history as _get_history
 from tools.add_visit_doctor import add_visit_doctor as _record_visit
 
@@ -25,7 +27,7 @@ mcp = FastMCP("visit-doctor-mcp-agent", lifespan=lifespan)
 def get_schema() -> str:
     return (
         "table: visits\n"
-        "columns: id (uuid), user_id, doctor_type, date_visit, "
+        "columns: id (uuid), user_id, doctor_type, visit_at, "
         "subjective, objective, assessment, plan, created_at"
     )
 
@@ -40,7 +42,7 @@ async def add_visit_doctor(data: DoctorVisit) -> dict:
         subjective: Patient complaints, history, and symptoms as reported.
         objective: Clinical findings, vitals, and examination results.
         assessment: Clinical impression or diagnosis.
-        date_visit: ISO 8601 date of the consultation (YYYY-MM-DD).
+        visit_at: ISO 8601 date of the consultation (YYYY-MM-DD).
         user_id: Identifier of the patient.
         plan: Treatment plan or next steps (optional).
     """
@@ -50,10 +52,8 @@ async def add_visit_doctor(data: DoctorVisit) -> dict:
 
 @mcp.tool(name="get_doctor_visits_history")
 async def get_doctor_visits_history(
-    last_date_visit: str,
-    user_id: str,
-    doctor_type: str | None = None,
-) -> list[dict]:
+    data: GetDoctorVisitsHistoryRequest
+) -> list[DoctorVisit]:
     """Retrieve SOAP notes for a user from a given date to today.
 
     Args:
@@ -62,12 +62,7 @@ async def get_doctor_visits_history(
         doctor_type: Optional specialty filter (oncology, gastroenterology, cardiology,
             hematology, nephrology, nutrition, endocrinology, mental_health, pulmonology).
     """
-    specialty = DoctorType(doctor_type) if doctor_type else None
-    records = await _get_history(
-        last_date_visit=last_date_visit,
-        user_id=user_id,
-        doctor_type=specialty,
-    )
+    records = await _get_history(data)
     return [r.model_dump() for r in records]
 
 
