@@ -13,3 +13,44 @@ class GetPatientAnalysesRequest(BaseModel):
         description="ISO 8601 start date for the search (YYYY-MM-DD).",
         format="date",
     )
+
+
+class GetPatientAnalysisRecord(BaseModel):
+    analysis_id: str
+    user_id: str
+    analysis_text: str | None = None
+    analysis_date: str | None = None
+    created_at: str = ""
+
+
+class UpdateAnalysisRequest(BaseModel):
+    analysis_id: str = Field(description="UUID of the analysis record to update.")
+    analysis_text: str | None = Field(default=None, description="Updated lab result text.")
+    analysis_date: str | None = Field(default=None, description="Updated ISO 8601 date YYYY-MM-DD.")
+
+
+class UpdateAnalysisResponse(BaseModel):
+    success: bool
+    error: str = ""
+
+
+class DeleteAnalysisRequest(BaseModel):
+    analysis_id: str = Field(description="UUID of the analysis record to delete.")
+
+
+class DeleteAnalysisResponse(BaseModel):
+    success: bool
+    error: str = ""
+
+
+class CreateAnalysesFromPromptRequest(BaseModel):
+    user_id: str = Field(description="Identifier of the patient.")
+    prompt: str = Field(description="Free-text lab notes to be parsed into analysis records.")
+
+
+class CreateAnalysesFromPromptResponse(BaseModel):
+    success: bool
+    list_missing_analysis: list[str] = Field(
+        default_factory=list,
+        description="Raw text of entries that had missing analysis_text or analysis_date.",
+    )

@@ -22,10 +22,10 @@ AnalysisDate = Annotated[
 
 class PatientAnalysis(BaseModel):
     user_id: str = Field(description="Identifier of the patient.")
-    analysis: str = Field(
+    analysis_text: str = Field(
         description="Raw or structured text of the lab results, e.g. 'Glucose: 105 mg/dL, HbA1c: 5.7%'."
     )
-    date: AnalysisDate
+    analysis_date: AnalysisDate
     created_at: str = Field(
         default="",
         description="ISO 8601 timestamp when the record was created.",

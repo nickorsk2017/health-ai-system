@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Toaster } from "sonner";
 
 import Sidebar from "@/components/layout/Sidebar/Sidebar";
 import TopBar from "@/components/layout/TopBar/TopBar";
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main className="flex-1 overflow-y-auto p-6">{children}</main>
           </div>
         </div>
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );

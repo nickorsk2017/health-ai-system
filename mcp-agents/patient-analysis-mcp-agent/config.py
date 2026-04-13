@@ -7,6 +7,9 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
     )
 
+    openai_api_key: str
+    openai_model: str = "gpt-4o-mini"
+
     postgres_user: str
     postgres_password: str
     postgres_db: str

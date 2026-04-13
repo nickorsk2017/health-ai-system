@@ -71,7 +71,6 @@ async def create_visits_by_prompt(data: VisitsByPromptRequestSchema) -> VisitsBy
         raise AgentConnectionError(f"visit_doctor_agent unreachable: {exc}") from exc
 
     payload = result.structured_content or {}
-    print("Received response from visit_doctor_agent for prompt processing:", payload)
     response_data = payload.get("result", payload)
 
     if not response_data:
