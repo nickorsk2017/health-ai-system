@@ -19,4 +19,4 @@ kill-inspector:
 	kill -9 $$(lsof -t -i :6304 -i :6305) 2>/dev/null || true
 
 kill-port:
-	kill -9 $$(lsof -t -i :6333) 2>/dev/null || true
+	kill -9 $$(lsof -t -i :6444) 2>/dev/null || true

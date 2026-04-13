@@ -1,3 +1,5 @@
+from venv import logger
+
 from fastapi import APIRouter, HTTPException, Query
 
 from schemas.diagnosis_schema import GPConsultationSchema

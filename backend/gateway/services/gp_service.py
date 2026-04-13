@@ -10,6 +10,7 @@ async def fetch_gp_consultation(user_id: str, start_date: str) -> GPConsultation
     try:
         analyses = await fetch_analyses(user_id, start_date)
         analyses_text = [r.analysis for r in analyses]
+        
     except AgentConnectionError as exc:
         raise AgentConnectionError(f"patient_analysis_agent unreachable during diagnosis: {exc}") from exc
     except NoDataFoundError:
@@ -30,8 +31,9 @@ async def fetch_gp_consultation(user_id: str, start_date: str) -> GPConsultation
     except Exception as exc:
         raise AgentConnectionError(f"gp_synthesis_agent unreachable: {exc}") from exc
 
-    payload = result.structured_content or {}
-    data = payload.get("result", {})
+    data = result.structured_content or {}
+    print("Extracted data for GP consultation:", data)
+
 
     if not data:
         raise NoDataFoundError(f"No GP consultation found for user {user_id}")

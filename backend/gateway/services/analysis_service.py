@@ -40,10 +40,7 @@ async def fetch_analyses(user_id: str, start_date: str) -> list[AnalysisRecordSc
     except Exception as exc:
         raise AgentConnectionError(f"patient_analysis_agent unreachable: {exc}") from exc
 
-    payload = result.structured_content or {}
+    payload = result.structured_content or {result:[]}
     records = payload.get("result", [])
-
-    if not records:
-        raise NoDataFoundError(f"No analysis records found for user {user_id}")
 
     return [AnalysisRecordSchema(**r) for r in records]
