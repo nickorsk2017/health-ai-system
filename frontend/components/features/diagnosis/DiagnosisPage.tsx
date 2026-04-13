@@ -39,7 +39,7 @@ export default function DiagnosisPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-xl font-semibold text-slate-800">GP Diagnosis</h1>
+        <h1 className="text-xl font-semibold text-slate-800">General Practitioner Diagnosis</h1>
         <p className="mt-1 text-sm text-slate-500">
           Synthesised GP recommendation based on specialist consilium.
         </p>

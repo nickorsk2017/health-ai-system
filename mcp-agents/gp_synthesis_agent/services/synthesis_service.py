@@ -29,6 +29,15 @@ def _format_findings(findings: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def _format_analyses(analyses: list[str]) -> str:
+    lines: list[str] = [f"## Laboratory Results — {len(analyses)} Record(s)\n"]
+    for i, text in enumerate(analyses, start=1):
+        lines.append(f"### [{i}] Lab Report")
+        lines.append(text)
+        lines.append("")
+    return "\n".join(lines)
+
+
 class SynthesisService:
     def __init__(self) -> None:
         self._llm = ChatOpenAI(
@@ -37,15 +46,21 @@ class SynthesisService:
             temperature=0.2,
         )
 
-    async def synthesize(self, findings: list[dict]) -> GPConsultation:
+    async def synthesize(self, findings: list[dict], analyses: list[str] | None = None) -> GPConsultation:
         findings_text = _format_findings(findings)
+        human_content = findings_text
+
+        if analyses:
+            human_content = f"{findings_text}\n\n{_format_analyses(analyses)}"
+            logger.info(f"Including {len(analyses)} lab result(s) in GP synthesis.")
+
         logger.info(f"Sending {len(findings)} specialist findings to GP synthesis LLM...")
 
         structured_llm = self._llm.with_structured_output(GPConsultation)
         consultation: GPConsultation = await structured_llm.ainvoke(
             [
                 SystemMessage(content=_load_system_prompt()),
-                HumanMessage(content=findings_text),
+                HumanMessage(content=human_content),
             ]
         )
 

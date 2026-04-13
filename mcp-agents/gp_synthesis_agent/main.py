@@ -55,7 +55,7 @@ async def get_final_gp_consultation(
             ),
         }
 
-    consultation = await _synthesis_service.synthesize(findings)
+    consultation = await _synthesis_service.synthesize(findings, data.analyses or [])
 
     logger.info(f"GP consultation complete for user={data.user_id}.")
     return consultation.model_dump()

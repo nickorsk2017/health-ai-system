@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     visit_doctor_agent_url: str
     consilium_agent_url: str
     gp_synthesis_agent_url: str
+    analysis_agent_url: str
     user_service_url: str
 
     cors_origins: list[str] = ["http://localhost:3000"]

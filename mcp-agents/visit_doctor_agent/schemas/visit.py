@@ -30,6 +30,7 @@ DateVisit = Annotated[
 ]
 
 class DoctorVisit(BaseModel):
+    visit_id: str | None = Field(description="Unique identifier for the visit record.")
     user_id: str = Field(description="Identifier of the patient.")
     doctor_type: DoctorType = Field(description="Medical specialty of the consulted physician.")
     visit_at: DateVisit

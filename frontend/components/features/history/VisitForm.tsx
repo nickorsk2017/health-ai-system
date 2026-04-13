@@ -45,7 +45,7 @@ export default function VisitForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccess(false);
-    const ok = await submitVisit({ ...form, user_id: selectedPatientId });
+    const ok = await submitVisit({ ...form, user_id: selectedPatientId! });
     if (ok) {
       setSuccess(true);
       setForm(EMPTY);
@@ -65,7 +65,8 @@ export default function VisitForm() {
           label="Visit Date"
           type="date"
           value={form.visit_at}
-          min={TODAY}
+          min="2025-01-01"
+          max={TODAY}
           onChange={(v) => set("visit_at", v)}
         />
       </div>

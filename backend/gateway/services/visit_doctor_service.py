@@ -25,8 +25,7 @@ async def record_visit(visit: CreateVisitSchema) -> RecordVisitResponseSchema:
     except Exception as exc:
         raise AgentConnectionError(f"visit_doctor_agent unreachable: {exc}") from exc
 
-    payload = result.structured_content or {}
-    data = payload.get("result", {})
+    data = result.structured_content or {}
 
     if not data:
         raise NoDataFoundError("visit_doctor_agent returned empty result")
@@ -45,6 +44,7 @@ async def fetch_visit_history(user_id: str, last_date_visit: str) -> list[VisitR
         raise AgentConnectionError(f"visit_doctor_agent unreachable: {exc}") from exc
 
     payload = result.structured_content or {}
+    print("Received visit history response:", payload)
     records = payload.get("result", [])
 
     if not records:

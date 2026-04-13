@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, Stethoscope, ClipboardList } from "lucide-react";
+import { Activity, ClipboardList, FlaskConical, Stethoscope } from "lucide-react";
 
 import cx from "@/utils/cx";
 
 const NAV_ITEMS = [
   { href: "/history", label: "Clinic History", icon: ClipboardList },
+  { href: "/analyses", label: "Lab Analyses", icon: FlaskConical },
   { href: "/consilium", label: "Consilium", icon: Activity },
-  { href: "/diagnosis", label: "Diagnosis", icon: Stethoscope },
+  { href: "/diagnosis", label: "Diagnosis PB", icon: Stethoscope },
 ];
 
 export default function Sidebar() {
