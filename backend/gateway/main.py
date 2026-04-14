@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from config import settings
 from routers.analyses_router import router as analyses_router
+from routers.appointments_router import router as appointments_router
+from routers.complaints_router import router as complaints_router
 from routers.consilium_router import router as consilium_router
 from routers.devices_router import router as devices_router
 from routers.diagnosis_router import router as diagnosis_router
@@ -28,6 +30,8 @@ app.include_router(consilium_router)
 app.include_router(diagnosis_router)
 app.include_router(analyses_router)
 app.include_router(devices_router)
+app.include_router(complaints_router)
+app.include_router(appointments_router)
 
 
 def run() -> None:

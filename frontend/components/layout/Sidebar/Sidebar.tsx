@@ -5,9 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Activity,
+  CalendarDays,
   ClipboardList,
   FlaskConical,
   LogOut,
+  MessageSquareWarning,
   Stethoscope,
   Watch,
 } from "lucide-react";
@@ -18,6 +20,8 @@ import cx from "@/utils/cx";
 const DOCTOR_NAV = [
   { href: "/history", label: "Clinic History", icon: ClipboardList },
   { href: "/analyses", label: "Lab Analysis", icon: FlaskConical },
+  { href: "/complaints", label: "Patient Complaints", icon: MessageSquareWarning },
+  { href: "/appointments", label: "Calendar", icon: CalendarDays },
   { href: "/consilium", label: "AI Consilium", icon: Activity },
   { href: "/diagnosis", label: "AI Diagnosis PB", icon: Stethoscope },
 ];
@@ -26,6 +30,8 @@ const PATIENT_NAV = [
   { href: "/history", label: "My Health History", icon: ClipboardList },
   { href: "/analyses", label: "My Lab Results", icon: FlaskConical },
   { href: "/devices", label: "My Devices", icon: Watch },
+  { href: "/complaints", label: "My Complaints", icon: MessageSquareWarning },
+  { href: "/appointments", label: "My Appointments", icon: CalendarDays },
 ];
 
 export default function Sidebar() {

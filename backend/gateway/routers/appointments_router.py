@@ -1,0 +1,23 @@
+from fastapi import APIRouter, HTTPException, Query
+
+from schemas.appointment_schema import AppointmentRecordSchema, CreateAppointmentSchema
+from services.appointment_service import create_appointment, fetch_appointments
+from services.exceptions import AgentConnectionError
+
+router = APIRouter(prefix="/api/v1/appointments", tags=["appointments"])
+
+
+@router.post("", response_model=AppointmentRecordSchema, status_code=201)
+async def add_appointment(body: CreateAppointmentSchema) -> AppointmentRecordSchema:
+    try:
+        return await create_appointment(body)
+    except AgentConnectionError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+
+
+@router.get("", response_model=list[AppointmentRecordSchema])
+async def list_appointments(user_id: str = Query(default="")) -> list[AppointmentRecordSchema]:
+    try:
+        return await fetch_appointments(user_id)
+    except AgentConnectionError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))

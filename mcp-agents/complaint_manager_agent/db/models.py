@@ -1,0 +1,25 @@
+import uuid
+from datetime import date, datetime
+
+from sqlalchemy import Date, DateTime, String, Text, func
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column
+
+from db.engine import Base
+
+COMPLAINT_STATUS_UNREAD = "unread"
+COMPLAINT_STATUS_READ = "read"
+COMPLAINT_STATUS_APPOINTMENT = "appointment"
+
+
+class Complaint(Base):
+    __tablename__ = "complaints"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    problem_health: Mapped[str] = mapped_column(Text, nullable=False)
+    date_public: Mapped[date] = mapped_column(Date, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default=COMPLAINT_STATUS_UNREAD)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
