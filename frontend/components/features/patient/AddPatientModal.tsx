@@ -17,8 +17,9 @@ const GENDER_OPTIONS = [
 
 const EMPTY: Entity.NewPatientForm = {
   name: "",
-  date_of_birth: "",
+  date_of_birth: "1980-01-01",
   gender: "male",
+  email: "",
 };
 
 type Props = {
@@ -50,6 +51,10 @@ export default function AddPatientModal({ isOpen, onClose }: Props) {
       setValidationError("Date of birth is required.");
       return;
     }
+    if (!form.email.trim()) {
+      setValidationError("Email is required.");
+      return;
+    }
     setValidationError(null);
     await createPatient(form);
   };
@@ -73,6 +78,13 @@ export default function AddPatientModal({ isOpen, onClose }: Props) {
           max={new Date().toISOString().split("T")[0]}
           onChange={(v) => set("date_of_birth", v)}
         />
+        <Input
+          label="Email"
+          type="email"
+          value={form.email}
+          placeholder="e.g. sarah@example.com"
+          onChange={(v) => set("email", v)}
+        />
         <Select
           label="Gender"
           value={form.gender}
@@ -93,7 +105,7 @@ export default function AddPatientModal({ isOpen, onClose }: Props) {
             Cancel
           </Button>
           <Button loading={isCreating} onClick={handleSave}>
-            Save Patient
+            Add Patient
           </Button>
         </div>
       </div>

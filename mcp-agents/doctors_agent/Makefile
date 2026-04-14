@@ -1,6 +1,7 @@
 .PHONY: install build inspect inspect-docker kill-inspector
 
 dev:
+	make kill-port
 	uv run doctors_agent
 
 build:
@@ -16,3 +17,6 @@ inspect-docker:
 
 kill-inspector:
 	kill -9 $$(lsof -t -i :6304 -i :6305) 2>/dev/null || true
+
+kill-port:
+	kill -9 $$(lsof -t -i :6333) 2>/dev/null || true

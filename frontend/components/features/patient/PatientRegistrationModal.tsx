@@ -24,7 +24,7 @@ export default function PatientRegistrationModal({ isOpen }: Props) {
   const { isCreating, createError, registerAsPatient, clearCreateError } = usePatientStore();
   const [form, setForm] = useState<Entity.NewPatientForm>({
     name: "",
-    date_of_birth: "",
+    date_of_birth: "1980-01-01",
     gender: "male",
     email: "",
   });

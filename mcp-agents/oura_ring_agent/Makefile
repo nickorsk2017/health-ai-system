@@ -1,6 +1,7 @@
 .PHONY: run-dev run-inspector kill-inspector run-inspector-docker build-docker
 
 dev:
+	make kill-port
 	uv run oura-ring-mcp-agent
 
 inspector:
@@ -16,3 +17,6 @@ inspector-docker:
 
 build-docker:
 	docker build -t oura-ring-mcp-agent .
+
+kill-port:
+	kill -9 $$(lsof -t -i :6330) 2>/dev/null || true
