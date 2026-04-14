@@ -30,7 +30,7 @@ async def lifespan(server: FastMCP) -> AsyncIterator[None]:
     yield
 
 
-mcp = FastMCP("visit-doctor-mcp-agent", lifespan=lifespan)
+mcp = FastMCP("client-history-agent", lifespan=lifespan)
 
 
 @mcp.resource("config://schema")

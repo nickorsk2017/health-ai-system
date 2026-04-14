@@ -8,7 +8,7 @@ from config import settings
 
 logger.add("mcp.log", rotation="10 MB")
 
-mcp = FastMCP("medical-consilium-agent")
+mcp = FastMCP("doctors-agent")
 
 _history_client = HistoryClient()
 _consilium_service = ConsiliumService()

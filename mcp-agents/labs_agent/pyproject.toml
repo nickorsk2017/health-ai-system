@@ -1,5 +1,5 @@
 [project]
-name = "patient-analysis-mcp-agent"
+name = "labs-agent"
 version = "0.1.0"
 description = "MCP agent that records and retrieves patient laboratory test results using PostgreSQL."
 requires-python = ">=3.12"
@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
-patient_analysis_agent = "main:run"
+labs_agent = "main:run"
 inspector = "main:run_inspector"
 
 [build-system]

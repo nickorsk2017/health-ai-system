@@ -1,5 +1,5 @@
 [project]
-name = "visit-doctor-mcp-agent"
+name = "client-history-agent"
 version = "0.1.0"
 description = "MCP agent that records and retrieves specialist consultations in SOAP format using PostgreSQL."
 requires-python = ">=3.12"
@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
-visit_doctor_agent = "main:run"
+client_history_agent = "main:run"
 inspector = "main:run_inspector"
 # Add mockup data to DB for clinical history
 seed_clinical_history = "seeds.seed_clinical_history:run"

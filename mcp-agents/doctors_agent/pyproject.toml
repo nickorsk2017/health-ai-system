@@ -1,5 +1,5 @@
 [project]
-name = "medical_consilium_agent"
+name = "doctors-agent"
 version = "0.1.0"
 description = "MCP orchestrator that runs a patient's history through a board of 9 specialist LLMs in parallel."
 requires-python = ">=3.12"
@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-medical_consilium_agent = "main:run"
+doctors_agent = "main:run"
 
 [build-system]
 requires = ["hatchling"]
