@@ -29,12 +29,10 @@ def _load_prompt(specialty: str) -> str:
 
 def _format_history(records: list[dict]) -> str:
     if not records:
-        logger.warning("No patient history records to format.")
         return "No patient history available."
 
     lines: list[str] = ["## Patient SOAP History\n"]
     for record in records:
-        logger.info(f"Formatting record: {record}")
         visit_date = record.get("history_date", "unknown date")
         lines.append(f"### Visit — {visit_date} | Specialty: {record.get('doctor_type', 'unknown')}")
         lines.append(f"**Subjective:** {record.get('subjective', '')}")
@@ -43,7 +41,19 @@ def _format_history(records: list[dict]) -> str:
         if record.get("plan"):
             lines.append(f"**Plan:** {record['plan']}")
         lines.append("")
+    return "\n".join(lines)
 
+
+def _format_labs(records: list[dict]) -> str:
+    if not records:
+        return "No laboratory data available."
+
+    lines: list[str] = ["## Laboratory Results\n"]
+    for record in records:
+        lab_date = record.get("analysis_date", "unknown date")
+        lines.append(f"### Lab Result — {lab_date}")
+        lines.append(record.get("analysis_text", ""))
+        lines.append("")
     return "\n".join(lines)
 
 
@@ -56,15 +66,15 @@ class ConsiliumService:
         )
 
     async def _analyze_specialty(
-        self, specialty: str, history_text: str
+        self, specialty: str, patient_context: str
     ) -> SpecialistFinding | None:
-        logger.info(f"[{specialty}] Sending history to LLM...")
+        logger.info(f"[{specialty}] Sending patient context to LLM...")
         structured_llm = self._llm.with_structured_output(SpecialistAnalysis)
 
         analysis: SpecialistAnalysis = await structured_llm.ainvoke(
             [
                 SystemMessage(content=_load_prompt(specialty)),
-                HumanMessage(content=history_text),
+                HumanMessage(content=patient_context),
             ]
         )
 
@@ -81,14 +91,16 @@ class ConsiliumService:
             probable_diagnosis=analysis.probable_diagnosis,
         )
 
-    async def run(self, records: list[dict]) -> list[SpecialistFinding]:
-        if not records:
-            raise ValueError("No patient history found for the given date range.")
+    async def run(
+        self, history_records: list[dict], lab_records: list[dict]
+    ) -> list[SpecialistFinding]:
+        if not history_records and not lab_records:
+            raise ValueError("No patient data provided for consilium.")
 
-        history_text = _format_history(records)
+        patient_context = _format_history(history_records) + "\n\n" + _format_labs(lab_records)
         logger.info(f"Launching parallel consilium across {len(SPECIALTIES)} specialties...")
 
-        tasks = [self._analyze_specialty(s, history_text) for s in SPECIALTIES]
+        tasks = [self._analyze_specialty(s, patient_context) for s in SPECIALTIES]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         findings: list[SpecialistFinding] = []

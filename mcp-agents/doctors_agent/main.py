@@ -1,16 +1,14 @@
 from fastmcp import FastMCP
 from loguru import logger
 
-from services.consilium_service import ConsiliumService
-from services.history_client import HistoryClient
-from schemas.http import GetPatientHistoryRequest
 from config import settings
+from schemas.http import ConsiliumRequest
+from services.consilium_service import ConsiliumService
 
 logger.add("mcp.log", rotation="10 MB")
 
 mcp = FastMCP("doctors-agent")
 
-_history_client = HistoryClient()
 _consilium_service = ConsiliumService()
 
 
@@ -23,17 +21,19 @@ def get_specialties() -> str:
 
 
 @mcp.tool(name="run_medical_consilium")
-async def run_medical_consilium(data: GetPatientHistoryRequest) -> list[dict]:
-    """Run a patient's full medical history through a board of 9 specialist LLMs in parallel.
+async def run_medical_consilium(data: ConsiliumRequest) -> list[dict]:
+    """Run patient history and lab data through a board of 9 specialist LLMs in parallel.
 
     Args:
-        user_id: Identifier of the patient.
-        start_date_clinic_history: ISO 8601 start date for history retrieval (YYYY-MM-DD).
+        history_records: SOAP patient history records from client_history_agent.
+        lab_records: Laboratory analysis records from labs_agent.
     """
-    logger.info(f"Starting consilium: user={data.user_id}, from={data.start_date}")
+    logger.info(
+        f"Starting consilium: {len(data.history_records)} SOAP note(s), "
+        f"{len(data.lab_records)} lab record(s)"
+    )
 
-    records = await _history_client.fetch(data.user_id, data.start_date)
-    findings = await _consilium_service.run(records)
+    findings = await _consilium_service.run(data.history_records, data.lab_records)
 
     logger.info(f"Consilium finished: {len(findings)} specialist finding(s) returned.")
     return [f.model_dump() for f in findings]
@@ -41,6 +41,7 @@ async def run_medical_consilium(data: GetPatientHistoryRequest) -> list[dict]:
 
 def run() -> None:
     mcp.run(transport="streamable-http", host=settings.mcp_host, port=settings.mcp_port)
+
 
 if __name__ == "__main__":
     run()

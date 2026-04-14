@@ -7,13 +7,13 @@ from services.agent_result import AgentResult, to_response
 
 async def fetch_consilium(user_id: str, start_date: str) -> AgentResult:
     try:
-        async with Client(settings.doctors_agent_url) as client:
+        async with Client(settings.master_orchestrator_agent_url) as client:
             response = await client.call_tool(
-                "run_medical_consilium",
+                "run_comprehensive_evaluation",
                 {"data": {"user_id": user_id, "start_date": start_date}},
             )
         raw_results = response.structured_content or {}
-        findings_collection = raw_results.get("result", [])
+        findings_collection = raw_results.get("findings", [])
         if not findings_collection:
             return to_response(error=f"No consilium findings for user {user_id}")
         return to_response(data=[SpecialistFindingSchema(**f) for f in findings_collection])

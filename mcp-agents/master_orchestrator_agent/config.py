@@ -2,10 +2,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    openai_api_key: str
-    openai_model: str = "gpt-4o-mini"
+    client_history_agent_url: str
+    labs_agent_url: str
+    doctors_agent_url: str
 
-    mcp_port: int = 6333
+    mcp_port: int = 6350
     mcp_host: str = "0.0.0.0"
 
     model_config = SettingsConfigDict(

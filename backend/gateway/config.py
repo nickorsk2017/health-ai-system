@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     device_orchestrator_agent_url: str
     complaint_manager_agent_url: str
     appointment_scheduler_agent_url: str
+    master_orchestrator_agent_url: str
 
     cors_origins: list[str] = ["http://localhost:3000"]
 
