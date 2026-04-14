@@ -1,7 +1,7 @@
 from datetime import date
 from enum import Enum
 from typing_extensions import Annotated
-from pydantic import BaseModel, Field, field_validator, AfterValidator
+from pydantic import BaseModel, Field, AfterValidator
 
 
 class DoctorType(str, Enum):
@@ -16,12 +16,14 @@ class DoctorType(str, Enum):
     pulmonology = "pulmonology"
     general_practitioner = "general_practitioner"
 
-def validate_not_past(visit_at: date) -> date:
-    if visit_at > date.today():
-        raise ValueError("date must be today or past")
-    return visit_at
 
-DateVisit = Annotated[
+def validate_not_past(history_date: date) -> date:
+    if history_date > date.today():
+        raise ValueError("date must be today or past")
+    return history_date
+
+
+HistoryDate = Annotated[
     date,
     AfterValidator(validate_not_past),
     Field(
@@ -30,11 +32,12 @@ DateVisit = Annotated[
     )
 ]
 
-class DoctorVisit(BaseModel):
-    visit_id: str | None = Field(description="Unique identifier for the visit record.")
+
+class PatientHistoryRecord(BaseModel):
+    history_id: str | None = Field(description="Unique identifier for the patient history record.")
     user_id: str = Field(description="Identifier of the patient.")
     doctor_type: DoctorType = Field(description="Medical specialty of the consulted physician.")
-    visit_at: DateVisit
+    history_date: HistoryDate
     subjective: str = Field(description="Patient's complaints, history, and symptoms as reported.")
     objective: str = Field(description="Clinical findings, vitals, and examination results.")
     assessment: str = Field(description="Clinical impression or diagnosis.")

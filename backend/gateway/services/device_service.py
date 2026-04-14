@@ -7,7 +7,7 @@ from schemas.device_schema import (
     DeviceRecordSchema,
     RemoveDeviceResponseSchema,
 )
-from services.agent_result import AgentResult
+from services.agent_result import AgentResult, to_response
 
 
 async def register_device(data: AddDeviceRequestSchema) -> AgentResult:
@@ -25,17 +25,10 @@ async def register_device(data: AddDeviceRequestSchema) -> AgentResult:
             )
         raw_results = response.structured_content or {}
         if not raw_results.get("success"):
-            return {"success": False, "data": None, "error": "device_orchestrator_agent returned failure on add_device"}
-        return {
-            "success": True,
-            "data": AddDeviceResponseSchema(
-                success=True,
-                device_id=raw_results.get("device_id", ""),
-            ),
-            "error": None,
-        }
+            return to_response(error="device_orchestrator_agent returned failure on add_device")
+        return to_response(data=AddDeviceResponseSchema(success=True, device_id=raw_results.get("device_id", "")))
     except Exception as exc:
-        return {"success": False, "data": None, "error": str(exc)}
+        return to_response(error=str(exc))
 
 
 async def delete_device(device_id: str) -> AgentResult:
@@ -47,10 +40,10 @@ async def delete_device(device_id: str) -> AgentResult:
             )
         raw_results = response.structured_content or {}
         if not raw_results.get("success"):
-            return {"success": False, "data": None, "error": raw_results.get("error", f"Device {device_id} not found")}
-        return {"success": True, "data": RemoveDeviceResponseSchema(success=True), "error": None}
+            return to_response(error=raw_results.get("error", f"Device {device_id} not found"))
+        return to_response(data=RemoveDeviceResponseSchema(success=True))
     except Exception as exc:
-        return {"success": False, "data": None, "error": str(exc)}
+        return to_response(error=str(exc))
 
 
 async def fetch_patient_devices(user_id: str) -> AgentResult:
@@ -66,10 +59,6 @@ async def fetch_patient_devices(user_id: str) -> AgentResult:
             else raw_results.get("result", []) if isinstance(raw_results, dict)
             else []
         )
-        return {
-            "success": True,
-            "data": [DeviceRecordSchema(**device) for device in devices_collection],
-            "error": None,
-        }
+        return to_response(data=[DeviceRecordSchema(**d) for d in devices_collection])
     except Exception as exc:
-        return {"success": False, "data": [], "error": str(exc)}
+        return to_response(error=str(exc))

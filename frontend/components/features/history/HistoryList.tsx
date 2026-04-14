@@ -7,18 +7,18 @@ import Alert from "@/components/common/Alert/Alert";
 import Button from "@/components/common/Button/Button";
 import Input from "@/components/common/Input/Input";
 import Spinner from "@/components/common/Spinner/Spinner";
-import EditVisitModal from "@/components/features/history/EditVisitModal";
+import EditPatientHistoryModal from "@/components/features/history/EditPatientHistoryModal";
 import { useRole } from "@/contexts/RoleContext";
 import { usePatientStore } from "@/stores/usePatientStore";
-import { useVisitStore } from "@/stores/useVisitStore";
+import { usePatientHistoryStore } from "@/stores/usePatientHistoryStore";
 import formatDate from "@/utils/formatDate";
 
-function VisitRow({
-  visit,
+function HistoryRow({
+  record,
   onEdit,
 }: {
-  visit: Entity.VisitRecord;
-  onEdit?: (v: Entity.VisitRecord) => void;
+  record: Entity.PatientHistoryRecord;
+  onEdit?: (r: Entity.PatientHistoryRecord) => void;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -30,10 +30,10 @@ function VisitRow({
       >
         <div className="flex items-center gap-4">
           <span className="rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium capitalize text-blue-700">
-            {visit.doctor_type.replace("_", " ")}
+            {record.doctor_type.replace("_", " ")}
           </span>
-          <span className="text-sm font-medium text-slate-800">{formatDate(visit.visit_at)}</span>
-          <span className="max-w-xs truncate text-sm text-slate-500">{visit.assessment}</span>
+          <span className="text-sm font-medium text-slate-800">{formatDate(record.history_date)}</span>
+          <span className="max-w-xs truncate text-sm text-slate-500">{record.assessment}</span>
         </div>
         <div className="flex items-center gap-2">
           {onEdit && (
@@ -42,16 +42,16 @@ function VisitRow({
               tabIndex={0}
               onClick={(e) => {
                 e.stopPropagation();
-                onEdit(visit);
+                onEdit(record);
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.stopPropagation();
-                  onEdit(visit);
+                  onEdit(record);
                 }
               }}
               className="rounded p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
-              aria-label="Edit visit"
+              aria-label="Edit record"
             >
               <Pencil className="h-3.5 w-3.5" />
             </span>
@@ -66,10 +66,10 @@ function VisitRow({
       {open && (
         <div className="grid grid-cols-2 gap-4 bg-slate-50 px-4 py-3 text-sm">
           {[
-            ["Subjective", visit.subjective],
-            ["Objective", visit.objective],
-            ["Assessment", visit.assessment],
-            ["Plan", visit.plan],
+            ["Subjective", record.subjective],
+            ["Objective", record.objective],
+            ["Assessment", record.assessment],
+            ["Plan", record.plan],
           ].map(([label, value]) => (
             <div key={label}>
               <p className="mb-1 font-medium text-slate-500">{label}</p>
@@ -85,11 +85,11 @@ function VisitRow({
 export default function HistoryList() {
   const { selectedPatientId } = usePatientStore();
   const { history, isFetchingHistory, error, fetchHistory, clearError, refreshTrigger } =
-    useVisitStore();
+    usePatientHistoryStore();
   const { role } = useRole();
   const fetchHistoryLabel = role === "patient" ? "Get My History" : "Get Patient History";
   const [since, setSince] = useState("2024-01-01");
-  const [editingVisit, setEditingVisit] = useState<Entity.VisitRecord | null>(null);
+  const [editingRecord, setEditingRecord] = useState<Entity.PatientHistoryRecord | null>(null);
 
   useEffect(() => {
     if (refreshTrigger > 0 && selectedPatientId) {
@@ -102,7 +102,7 @@ export default function HistoryList() {
     <div className="flex flex-col gap-4">
       <div className="flex items-end gap-3">
         <Input
-          label="Visits from"
+          label="Records from"
           type="date"
           value={since}
           onChange={setSince}
@@ -120,25 +120,25 @@ export default function HistoryList() {
       )}
       {!isFetchingHistory && history.length > 0 && (
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-          {history.map((v) => (
-            <VisitRow
-              key={v.visit_id}
-              visit={v}
-              onEdit={role === "doctor" ? setEditingVisit : undefined}
+          {history.map((r) => (
+            <HistoryRow
+              key={r.history_id}
+              record={r}
+              onEdit={role === "doctor" ? setEditingRecord : undefined}
             />
           ))}
         </div>
       )}
       {!isFetchingHistory && history.length === 0 && !error && (
         <p className="py-6 text-center text-sm text-slate-400">
-          No visits loaded. Select a date range and click &quot;{fetchHistoryLabel}&quot;.
+          No records loaded. Select a date range and click &quot;{fetchHistoryLabel}&quot;.
         </p>
       )}
-      {editingVisit && (
-        <EditVisitModal
-          visit={editingVisit}
-          isOpen={!!editingVisit}
-          onClose={() => setEditingVisit(null)}
+      {editingRecord && (
+        <EditPatientHistoryModal
+          record={editingRecord}
+          isOpen={!!editingRecord}
+          onClose={() => setEditingRecord(null)}
         />
       )}
     </div>

@@ -10,7 +10,7 @@ from schemas.analysis_schema import (
     MutateAnalysisResponseSchema,
     UpdateAnalysisSchema,
 )
-from services.agent_result import AgentResult
+from services.agent_result import AgentResult, to_response
 
 
 async def record_analysis(data: AnalysisRequestSchema) -> AgentResult:
@@ -28,13 +28,9 @@ async def record_analysis(data: AnalysisRequestSchema) -> AgentResult:
             )
         raw_results = response.structured_content or {}
         analysis_data = raw_results.get("result", raw_results)
-        return {
-            "success": True,
-            "data": AnalysisResponseSchema(success=analysis_data.get("success", False)),
-            "error": None,
-        }
+        return to_response(data=AnalysisResponseSchema(success=analysis_data.get("success", False)))
     except Exception as exc:
-        return {"success": False, "data": None, "error": str(exc)}
+        return to_response(error=str(exc))
 
 
 async def fetch_analyses(user_id: str, start_date: str) -> AgentResult:
@@ -46,13 +42,9 @@ async def fetch_analyses(user_id: str, start_date: str) -> AgentResult:
             )
         raw_results = response.structured_content or {}
         analyses_collection = raw_results.get("result", [])
-        return {
-            "success": True,
-            "data": [AnalysisRecordSchema(**analysis) for analysis in analyses_collection],
-            "error": None,
-        }
+        return to_response(data=[AnalysisRecordSchema(**a) for a in analyses_collection])
     except Exception as exc:
-        return {"success": False, "data": [], "error": str(exc)}
+        return to_response(error=str(exc))
 
 
 async def update_analysis(analysis_id: str, data: UpdateAnalysisSchema) -> AgentResult:
@@ -71,10 +63,10 @@ async def update_analysis(analysis_id: str, data: UpdateAnalysisSchema) -> Agent
         raw_results = response.structured_content or {}
         analysis_data = raw_results.get("result", raw_results)
         if not analysis_data.get("success"):
-            return {"success": False, "data": None, "error": analysis_data.get("error", f"Analysis {analysis_id} not found")}
-        return {"success": True, "data": MutateAnalysisResponseSchema(success=True), "error": None}
+            return to_response(error=analysis_data.get("error", f"Analysis {analysis_id} not found"))
+        return to_response(data=MutateAnalysisResponseSchema(success=True))
     except Exception as exc:
-        return {"success": False, "data": None, "error": str(exc)}
+        return to_response(error=str(exc))
 
 
 async def delete_analysis(analysis_id: str) -> AgentResult:
@@ -87,10 +79,10 @@ async def delete_analysis(analysis_id: str) -> AgentResult:
         raw_results = response.structured_content or {}
         analysis_data = raw_results.get("result", raw_results)
         if not analysis_data.get("success"):
-            return {"success": False, "data": None, "error": analysis_data.get("error", f"Analysis {analysis_id} not found")}
-        return {"success": True, "data": MutateAnalysisResponseSchema(success=True), "error": None}
+            return to_response(error=analysis_data.get("error", f"Analysis {analysis_id} not found"))
+        return to_response(data=MutateAnalysisResponseSchema(success=True))
     except Exception as exc:
-        return {"success": False, "data": None, "error": str(exc)}
+        return to_response(error=str(exc))
 
 
 async def create_analyses_from_prompt(data: AnalysisByPromptRequestSchema) -> AgentResult:
@@ -102,13 +94,9 @@ async def create_analyses_from_prompt(data: AnalysisByPromptRequestSchema) -> Ag
             )
         raw_results = response.structured_content or {}
         analysis_data = raw_results.get("result", raw_results)
-        return {
-            "success": True,
-            "data": AnalysisByPromptResponseSchema(
-                success=analysis_data.get("success", False),
-                list_missing_analysis=analysis_data.get("list_missing_analysis", []),
-            ),
-            "error": None,
-        }
+        return to_response(data=AnalysisByPromptResponseSchema(
+            success=analysis_data.get("success", False),
+            list_missing_analysis=analysis_data.get("list_missing_analysis", []),
+        ))
     except Exception as exc:
-        return {"success": False, "data": None, "error": str(exc)}
+        return to_response(error=str(exc))

@@ -10,13 +10,13 @@ class Base(DeclarativeBase):
     pass
 
 
-class Visit(Base):
-    __tablename__ = "visits"
+class PatientHistory(Base):
+    __tablename__ = "patient_histories"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     doctor_type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
-    visit_at: Mapped[date] = mapped_column(Date, nullable=False, index=True)
+    history_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     subjective: Mapped[str] = mapped_column(Text, nullable=False)
     objective: Mapped[str] = mapped_column(Text, nullable=False)
     assessment: Mapped[str] = mapped_column(Text, nullable=False)

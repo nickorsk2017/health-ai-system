@@ -7,7 +7,7 @@ import Button from "@/components/common/Button/Button";
 import Modal from "@/components/common/Modal/Modal";
 import TextArea from "@/components/common/TextArea/TextArea";
 import { usePatientStore } from "@/stores/usePatientStore";
-import { useVisitStore } from "@/stores/useVisitStore";
+import { usePatientHistoryStore } from "@/stores/usePatientHistoryStore";
 
 type Props = {
   isOpen: boolean;
@@ -17,7 +17,8 @@ type Props = {
 
 export default function AddHistoryByPromptModal({ isOpen, onClose, onSuccess }: Props) {
   const { selectedPatientId } = usePatientStore();
-  const { isProcessingPrompt, promptError, submitByPrompt, clearPromptError } = useVisitStore();
+  const { isProcessingPrompt, promptError, submitByPrompt, clearPromptError } =
+    usePatientHistoryStore();
   const [prompt, setPrompt] = useState("");
 
   const handleClose = () => {

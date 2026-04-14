@@ -8,7 +8,7 @@ Return a JSON object with a `visits` array. Each element represents one distinct
 
 ## For Each Visit, Extract
 
-- `visit_at` — ISO 8601 date (YYYY-MM-DD). If only month/year is given, use the 1st of that month. If a relative expression is used (e.g., "last week", "3 months ago"), compute it from today's date. If completely absent, use today's date.
+- `history_date` — ISO 8601 date (YYYY-MM-DD). If only month/year is given, use the 1st of that month. If a relative expression is used (e.g., "last week", "3 months ago"), compute it from today's date. If completely absent, use today's date.
 - `doctor_type` — map to exactly one of the values below. Default to `general_practitioner` when unclear.
 - `subjective` — patient complaints, history, and reported symptoms. If not mentioned, write exactly: `Data not provided`.
 - `objective` — clinical findings, vitals, lab values, examination results. If not mentioned, write exactly: `Data not provided`.

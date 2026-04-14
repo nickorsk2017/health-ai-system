@@ -8,8 +8,8 @@ class ConsiliumResponse(BaseModel):
     )
 
 
-class GetDoctorVisitsHistoryRequest(BaseModel):
+class GetPatientHistoryRequest(BaseModel):
     user_id: str = Field(description="Identifier of the patient.")
     start_date: datetime.date = Field(
         description="ISO 8601 start date for history retrieval (YYYY-MM-DD)."
-    )   
+    )

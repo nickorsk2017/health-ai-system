@@ -11,21 +11,21 @@ declare namespace Entity {
     | "pulmonology"
     | "general_practitioner";
 
-  type CreateVisit = {
+  type CreatePatientHistory = {
     user_id: string;
     doctor_type: DoctorType;
-    visit_at: string;
+    history_date: string;
     subjective: string;
     objective: string;
     assessment: string;
     plan: string;
   };
 
-  type VisitRecord = {
-    visit_id: string;
+  type PatientHistoryRecord = {
+    history_id: string;
     user_id: string;
     doctor_type: string;
-    visit_at: string;
+    history_date: string;
     subjective: string;
     objective: string;
     assessment: string;
@@ -33,30 +33,30 @@ declare namespace Entity {
     created_at: string;
   };
 
-  type RecordVisitResponse = {
+  type RecordPatientHistoryResponse = {
     success: boolean;
-    visit_id: string;
+    history_id: string;
   };
 
-  type VisitsByPromptRequest = {
+  type HistoryFromPromptRequest = {
     user_id: string;
     prompt: string;
   };
 
-  type VisitsByPromptResponse = {
+  type HistoryFromPromptResponse = {
     success: boolean;
     count: number;
   };
 
-  type UpdateVisit = {
-    visit_at: string;
+  type UpdatePatientHistory = {
+    history_date: string;
     subjective: string;
     objective: string;
     assessment: string;
     plan: string;
   };
 
-  type MutateVisitResponse = {
+  type MutatePatientHistoryResponse = {
     success: boolean;
   };
 }

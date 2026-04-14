@@ -2,7 +2,7 @@ from fastmcp import Client
 
 from config import settings
 from schemas.consilium_schema import SpecialistFindingSchema
-from services.agent_result import AgentResult
+from services.agent_result import AgentResult, to_response
 
 
 async def fetch_consilium(user_id: str, start_date: str) -> AgentResult:
@@ -15,11 +15,7 @@ async def fetch_consilium(user_id: str, start_date: str) -> AgentResult:
         raw_results = response.structured_content or {}
         findings_collection = raw_results.get("result", [])
         if not findings_collection:
-            return {"success": False, "data": [], "error": f"No consilium findings for user {user_id}"}
-        return {
-            "success": True,
-            "data": [SpecialistFindingSchema(**finding) for finding in findings_collection],
-            "error": None,
-        }
+            return to_response(error=f"No consilium findings for user {user_id}")
+        return to_response(data=[SpecialistFindingSchema(**f) for f in findings_collection])
     except Exception as exc:
-        return {"success": False, "data": [], "error": str(exc)}
+        return to_response(error=str(exc))

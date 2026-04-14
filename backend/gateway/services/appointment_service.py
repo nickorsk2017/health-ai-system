@@ -2,7 +2,7 @@ from fastmcp import Client
 
 from config import settings
 from schemas.appointment_schema import AppointmentRecordSchema, CreateAppointmentSchema
-from services.agent_result import AgentResult
+from services.agent_result import AgentResult, to_response
 
 
 async def create_appointment(data: CreateAppointmentSchema) -> AgentResult:
@@ -22,7 +22,7 @@ async def create_appointment(data: CreateAppointmentSchema) -> AgentResult:
             )
         raw_results = response.structured_content or {}
         if not raw_results.get("success"):
-            return {"success": False, "data": None, "error": raw_results.get("error", "appointment_scheduler_agent returned failure")}
+            return to_response(error=raw_results.get("error", "appointment_scheduler_agent returned failure"))
 
         fetch_result = await fetch_appointments(data.user_id)
         if not fetch_result["success"]:
@@ -32,10 +32,10 @@ async def create_appointment(data: CreateAppointmentSchema) -> AgentResult:
             None,
         )
         if not appointment:
-            return {"success": False, "data": None, "error": "Appointment created but could not be retrieved"}
-        return {"success": True, "data": appointment, "error": None}
+            return to_response(error="Appointment created but could not be retrieved", success=False)
+        return to_response(data=appointment)
     except Exception as exc:
-        return {"success": False, "data": None, "error": str(exc)}
+        return to_response(error=str(exc))
 
 
 async def fetch_appointments(user_id: str) -> AgentResult:
@@ -47,10 +47,6 @@ async def fetch_appointments(user_id: str) -> AgentResult:
             )
         raw_results = response.structured_content
         appointments_collection = raw_results if isinstance(raw_results, list) else []
-        return {
-            "success": True,
-            "data": [AppointmentRecordSchema(**appointment) for appointment in appointments_collection],
-            "error": None,
-        }
+        return to_response(data=[AppointmentRecordSchema(**a) for a in appointments_collection])
     except Exception as exc:
-        return {"success": False, "data": [], "error": str(exc)}
+        return to_response(error=str(exc))

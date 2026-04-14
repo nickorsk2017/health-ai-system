@@ -3,7 +3,7 @@ from loguru import logger
 
 from services.consilium_service import ConsiliumService
 from services.history_client import HistoryClient
-from schemas.http import GetDoctorVisitsHistoryRequest
+from schemas.http import GetPatientHistoryRequest
 from config import settings
 
 logger.add("mcp.log", rotation="10 MB")
@@ -23,7 +23,7 @@ def get_specialties() -> str:
 
 
 @mcp.tool(name="run_medical_consilium")
-async def run_medical_consilium(data: GetDoctorVisitsHistoryRequest) -> list[dict]:
+async def run_medical_consilium(data: GetPatientHistoryRequest) -> list[dict]:
     """Run a patient's full medical history through a board of 9 specialist LLMs in parallel.
 
     Args:

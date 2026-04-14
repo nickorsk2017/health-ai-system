@@ -8,48 +8,49 @@ import Button from "@/components/common/Button/Button";
 import Input from "@/components/common/Input/Input";
 import Modal from "@/components/common/Modal/Modal";
 import TextArea from "@/components/common/TextArea/TextArea";
-import { useVisitStore } from "@/stores/useVisitStore";
+import { usePatientHistoryStore } from "@/stores/usePatientHistoryStore";
 
 type Props = {
-  visit: Entity.VisitRecord;
+  record: Entity.PatientHistoryRecord;
   isOpen: boolean;
   onClose: () => void;
 };
 
 const TODAY = new Date().toISOString().split("T")[0];
 
-export default function EditVisitModal({ visit, isOpen, onClose }: Props) {
-  const { isUpdating, isDeleting, editError, updateVisit, deleteVisit, clearEditError } = useVisitStore();
-  const [form, setForm] = useState<Entity.UpdateVisit>({
-    visit_at: visit.visit_at,
-    subjective: visit.subjective,
-    objective: visit.objective,
-    assessment: visit.assessment,
-    plan: visit.plan,
+export default function EditPatientHistoryModal({ record, isOpen, onClose }: Props) {
+  const { isUpdating, isDeleting, editError, updateHistory, deleteHistory, clearEditError } =
+    usePatientHistoryStore();
+  const [form, setForm] = useState<Entity.UpdatePatientHistory>({
+    history_date: record.history_date,
+    subjective: record.subjective,
+    objective: record.objective,
+    assessment: record.assessment,
+    plan: record.plan,
   });
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setForm({
-        visit_at: visit.visit_at,
-        subjective: visit.subjective,
-        objective: visit.objective,
-        assessment: visit.assessment,
-        plan: visit.plan,
+        history_date: record.history_date,
+        subjective: record.subjective,
+        objective: record.objective,
+        assessment: record.assessment,
+        plan: record.plan,
       });
       setConfirmDelete(false);
       clearEditError();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
-  const set = (key: keyof Entity.UpdateVisit, value: string) =>
+  const set = (key: keyof Entity.UpdatePatientHistory, value: string) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const ok = await updateVisit(visit.visit_id, form);
+    const ok = await updateHistory(record.history_id, form);
     if (ok) onClose();
   };
 
@@ -58,20 +59,20 @@ export default function EditVisitModal({ visit, isOpen, onClose }: Props) {
       setConfirmDelete(true);
       return;
     }
-    const ok = await deleteVisit(visit.visit_id);
+    const ok = await deleteHistory(record.history_id);
     if (ok) onClose();
   };
 
   return (
-    <Modal isOpen={isOpen} title="Edit Visit" onClose={onClose} className="max-w-2xl">
+    <Modal isOpen={isOpen} title="Edit Record" onClose={onClose} className="max-w-2xl">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input
           label="Visit Date"
           type="date"
-          value={form.visit_at}
+          value={form.history_date}
           min="2025-01-01"
           max={TODAY}
-          onChange={(v) => set("visit_at", v)}
+          onChange={(v) => set("history_date", v)}
         />
         <TextArea
           label="Subjective — Patient complaints & history"

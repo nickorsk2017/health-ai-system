@@ -8,7 +8,7 @@ import Input from "@/components/common/Input/Input";
 import Select from "@/components/common/Select/Select";
 import TextArea from "@/components/common/TextArea/TextArea";
 import { usePatientStore } from "@/stores/usePatientStore";
-import { useVisitStore } from "@/stores/useVisitStore";
+import { usePatientHistoryStore } from "@/stores/usePatientHistoryStore";
 
 const DOCTOR_OPTIONS = [
   { value: "oncology", label: "Oncology" },
@@ -27,16 +27,16 @@ const TODAY = new Date().toISOString().split("T")[0];
 
 const EMPTY = {
   doctor_type: "oncology" as Entity.DoctorType,
-  visit_at: TODAY,
+  history_date: TODAY,
   subjective: "",
   objective: "",
   assessment: "",
   plan: "",
 };
 
-export default function VisitForm() {
+export default function PatientHistoryForm() {
   const { selectedPatientId } = usePatientStore();
-  const { isSubmitting, error, submitVisit, clearError } = useVisitStore();
+  const { isSubmitting, error, submitHistory, clearError } = usePatientHistoryStore();
   const [form, setForm] = useState(EMPTY);
   const [success, setSuccess] = useState(false);
 
@@ -46,7 +46,7 @@ export default function VisitForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccess(false);
-    const ok = await submitVisit({ ...form, user_id: selectedPatientId! });
+    const ok = await submitHistory({ ...form, user_id: selectedPatientId! });
     if (ok) {
       setSuccess(true);
       setForm(EMPTY);
@@ -65,10 +65,10 @@ export default function VisitForm() {
         <Input
           label="Visit Date"
           type="date"
-          value={form.visit_at}
+          value={form.history_date}
           min="2025-01-01"
           max={TODAY}
-          onChange={(v) => set("visit_at", v)}
+          onChange={(v) => set("history_date", v)}
         />
       </div>
       <TextArea
@@ -97,10 +97,10 @@ export default function VisitForm() {
       />
       {error && <Alert message={error} onDismiss={clearError} />}
       {success && (
-        <Alert variant="success" message="Visit recorded successfully." onDismiss={() => setSuccess(false)} />
+        <Alert variant="success" message="Record saved successfully." onDismiss={() => setSuccess(false)} />
       )}
       <Button type="submit" loading={isSubmitting} className="self-end">
-        Save Visit
+        Save Record
       </Button>
     </form>
   );

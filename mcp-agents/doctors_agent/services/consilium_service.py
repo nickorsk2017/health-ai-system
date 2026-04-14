@@ -35,7 +35,7 @@ def _format_history(records: list[dict]) -> str:
     lines: list[str] = ["## Patient SOAP History\n"]
     for record in records:
         logger.info(f"Formatting record: {record}")
-        visit_date = record.get("visit_at") or record.get("date_visit", "unknown date")
+        visit_date = record.get("history_date", "unknown date")
         lines.append(f"### Visit — {visit_date} | Specialty: {record.get('doctor_type', 'unknown')}")
         lines.append(f"**Subjective:** {record.get('subjective', '')}")
         lines.append(f"**Objective:** {record.get('objective', '')}")

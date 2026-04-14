@@ -1,53 +1,58 @@
-
 from datetime import date
 
 from pydantic import BaseModel, Field
-from schemas.visit import DoctorVisit
+from schemas.patient_history import PatientHistoryRecord
 
 
-
-class RecordDoctorVisitResponse(BaseModel):
+class RecordPatientHistoryResponse(BaseModel):
     success: bool
-    visit_id: str
+    history_id: str
 
 
-class GetDoctorVisitsHistoryResponse(BaseModel):
-    records: list[DoctorVisit]
+class GetPatientHistoryResponse(BaseModel):
+    records: list[PatientHistoryRecord]
 
-class GetDoctorVisitsHistoryRequest(BaseModel):
-    last_date_visit: date = Field(description="YYYY-MM-DD, Date of the medical visit in ISO 8601 format (YYYY-MM-DD). Must be today or in the past.", format="date",)
+
+class GetPatientHistoryRequest(BaseModel):
+    last_history_date: date = Field(
+        description="YYYY-MM-DD, Date of the medical visit in ISO 8601 format (YYYY-MM-DD). Must be today or in the past.",
+        format="date",
+    )
     user_id: str
-    doctor_type: str = Field(default="", description="(Optional) Medical specialty to filter visits by. If not provided, returns visits of all specialties.")
+    doctor_type: str = Field(
+        default="",
+        description="(Optional) Medical specialty to filter by. If not provided, returns all specialties.",
+    )
 
 
-class CreateVisitsFromPromptRequest(BaseModel):
+class CreateHistoryFromPromptRequest(BaseModel):
     user_id: str = Field(description="Identifier of the patient.")
     prompt: str = Field(description="Free-text clinical notes describing one or more medical visits.")
 
 
-class CreateVisitsFromPromptResponse(BaseModel):
+class CreateHistoryFromPromptResponse(BaseModel):
     success: bool
-    count: int = Field(description="Number of visit records created.")
+    count: int = Field(description="Number of patient history records created.")
 
 
-class UpdateVisitRequest(BaseModel):
-    visit_id: str = Field(description="UUID of the visit record to update.")
-    visit_at: date = Field(description="ISO 8601 date of the consultation (YYYY-MM-DD).")
+class UpdatePatientHistoryRequest(BaseModel):
+    history_id: str = Field(description="UUID of the patient history record to update.")
+    history_date: date = Field(description="ISO 8601 date of the consultation (YYYY-MM-DD).")
     subjective: str = Field(description="Patient complaints, history, and symptoms.")
     objective: str = Field(description="Clinical findings, vitals, and examination results.")
     assessment: str = Field(description="Clinical impression or diagnosis.")
     plan: str = Field(default="", description="Treatment plan or next steps.")
 
 
-class UpdateVisitResponse(BaseModel):
+class UpdatePatientHistoryResponse(BaseModel):
     success: bool
     error: str = ""
 
 
-class DeleteVisitRequest(BaseModel):
-    visit_id: str = Field(description="UUID of the visit record to delete.")
+class DeletePatientHistoryRequest(BaseModel):
+    history_id: str = Field(description="UUID of the patient history record to delete.")
 
 
-class DeleteVisitResponse(BaseModel):
+class DeletePatientHistoryResponse(BaseModel):
     success: bool
     error: str = ""

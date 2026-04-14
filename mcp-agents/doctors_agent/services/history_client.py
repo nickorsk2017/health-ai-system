@@ -11,11 +11,11 @@ class HistoryClient:
 
         async with Client(settings.client_history_agent_url) as client:
             result = await client.call_tool(
-                "get_doctor_visits_history",
+                "get_patient_history",
                 {
                     "data": {
                         "user_id": user_id,
-                        "last_date_visit": start_date,
+                        "last_history_date": start_date,
                         "doctor_type": "",
                     }
                 },

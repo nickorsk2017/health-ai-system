@@ -2,10 +2,10 @@
 
 import { create } from "zustand";
 
-import { VisitService } from "@/services/VisitService";
+import { PatientHistoryService } from "@/services/PatientHistoryService";
 
 type State = {
-  history: Entity.VisitRecord[];
+  history: Entity.PatientHistoryRecord[];
   isSubmitting: boolean;
   isFetchingHistory: boolean;
   isProcessingPrompt: boolean;
@@ -15,17 +15,17 @@ type State = {
   promptError: string | null;
   editError: string | null;
   refreshTrigger: number;
-  submitVisit: (data: Entity.CreateVisit) => Promise<boolean>;
-  fetchHistory: (userId: string, lastDateVisit: string) => Promise<void>;
-  submitByPrompt: (data: Entity.VisitsByPromptRequest) => Promise<boolean>;
-  updateVisit: (visitId: string, data: Entity.UpdateVisit) => Promise<boolean>;
-  deleteVisit: (visitId: string) => Promise<boolean>;
+  submitHistory: (data: Entity.CreatePatientHistory) => Promise<boolean>;
+  fetchHistory: (userId: string, lastHistoryDate: string) => Promise<void>;
+  submitByPrompt: (data: Entity.HistoryFromPromptRequest) => Promise<boolean>;
+  updateHistory: (historyId: string, data: Entity.UpdatePatientHistory) => Promise<boolean>;
+  deleteHistory: (historyId: string) => Promise<boolean>;
   clearError: () => void;
   clearPromptError: () => void;
   clearEditError: () => void;
 };
 
-export const useVisitStore = create<State>((set) => ({
+export const usePatientHistoryStore = create<State>((set) => ({
   history: [],
   isSubmitting: false,
   isFetchingHistory: false,
@@ -37,10 +37,10 @@ export const useVisitStore = create<State>((set) => ({
   editError: null,
   refreshTrigger: 0,
 
-  submitVisit: async (data) => {
+  submitHistory: async (data) => {
     set({ isSubmitting: true, error: null });
     try {
-      await VisitService.recordVisit(data);
+      await PatientHistoryService.recordHistory(data);
       set({ isSubmitting: false });
       return true;
     } catch (err) {
@@ -49,10 +49,10 @@ export const useVisitStore = create<State>((set) => ({
     }
   },
 
-  fetchHistory: async (userId, lastDateVisit) => {
+  fetchHistory: async (userId, lastHistoryDate) => {
     set({ isFetchingHistory: true, error: null, history: [] });
     try {
-      const history = await VisitService.fetchHistory(userId, lastDateVisit);
+      const history = await PatientHistoryService.fetchHistory(userId, lastHistoryDate);
       set({ history, isFetchingHistory: false });
     } catch (err) {
       set({ isFetchingHistory: false, error: (err as Error).message });
@@ -62,7 +62,7 @@ export const useVisitStore = create<State>((set) => ({
   submitByPrompt: async (data) => {
     set({ isProcessingPrompt: true, promptError: null });
     try {
-      await VisitService.createByPrompt(data);
+      await PatientHistoryService.createByPrompt(data);
       set((s) => ({ isProcessingPrompt: false, refreshTrigger: s.refreshTrigger + 1 }));
       return true;
     } catch (err) {
@@ -71,10 +71,10 @@ export const useVisitStore = create<State>((set) => ({
     }
   },
 
-  updateVisit: async (visitId, data) => {
+  updateHistory: async (historyId, data) => {
     set({ isUpdating: true, editError: null });
     try {
-      await VisitService.updateVisit(visitId, data);
+      await PatientHistoryService.updateHistory(historyId, data);
       set((s) => ({ isUpdating: false, refreshTrigger: s.refreshTrigger + 1 }));
       return true;
     } catch (err) {
@@ -83,10 +83,10 @@ export const useVisitStore = create<State>((set) => ({
     }
   },
 
-  deleteVisit: async (visitId) => {
+  deleteHistory: async (historyId) => {
     set({ isDeleting: true, editError: null });
     try {
-      await VisitService.deleteVisit(visitId);
+      await PatientHistoryService.deleteHistory(historyId);
       set((s) => ({ isDeleting: false, refreshTrigger: s.refreshTrigger + 1 }));
       return true;
     } catch (err) {

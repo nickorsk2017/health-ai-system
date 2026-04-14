@@ -22,15 +22,15 @@ from sqlalchemy import insert, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from config import settings
-from db.models import Base, Visit
+from db.models import Base, PatientHistory
 
 USER_ID = "45533b8e-9c1a-4d3f-8c2a-123456789abc"
 
-VISITS: list[dict] = [
-    # ── Visit 1 ────────────────────────────────────────────────────────────────
+RECORDS: list[dict] = [
+    # ── Record 1 ────────────────────────────────────────────────────────────────
     {
         "doctor_type": "cardiology",
-        "visit_at": date(2026, 1, 10),
+        "history_date": date(2026, 1, 10),
         "subjective": (
             "Patient reports mild palpitations over the past 6 weeks and persistent "
             "'brain fog' affecting concentration at work. Denies chest pain, dyspnea, or syncope."
@@ -48,10 +48,10 @@ VISITS: list[dict] = [
             "Home BP monitoring instructed. Follow-up in 6 weeks."
         ),
     },
-    # ── Visit 2 ────────────────────────────────────────────────────────────────
+    # ── Record 2 ────────────────────────────────────────────────────────────────
     {
         "doctor_type": "mental_health",
-        "visit_at": date(2026, 1, 25),
+        "history_date": date(2026, 1, 25),
         "subjective": (
             "Presents with significant fatigue over the past 3 months, loss of interest in hobbies "
             "he previously enjoyed (cycling, reading), and reports 'aching bones', particularly in "
@@ -71,10 +71,10 @@ VISITS: list[dict] = [
             "to be explored if fatigue does not improve with antidepressant therapy."
         ),
     },
-    # ── Visit 3 ────────────────────────────────────────────────────────────────
+    # ── Record 3 ────────────────────────────────────────────────────────────────
     {
         "doctor_type": "gastroenterology",
-        "visit_at": date(2026, 3, 14),
+        "history_date": date(2026, 3, 14),
         "subjective": (
             "Chronic constipation for approximately 2 months, opening bowels only every 3-2 days. "
             "Intermittent epigastric pain after meals, non-radiating, no hematemesis or melena. "
@@ -93,10 +93,10 @@ VISITS: list[dict] = [
             "Avoid NSAIDs. H. pylori breath test ordered. Follow-up in 6 weeks or sooner if symptoms worsen."
         ),
     },
-    # ── Visit 2 ────────────────────────────────────────────────────────────────
+    # ── Record 4 ────────────────────────────────────────────────────────────────
     {
         "doctor_type": "nephrology",
-        "visit_at": date(2026, 3, 20),
+        "history_date": date(2026, 3, 20),
         "subjective": (
             "Sudden-onset sharp right-sided flank pain radiating to the groin, rated 8/10, "
             "with associated nausea. Reports one prior episode of kidney stones approximately "
@@ -115,10 +115,10 @@ VISITS: list[dict] = [
             "CT Urogram (non-contrast) scheduled. Metabolic stone panel deferred pending imaging confirmation."
         ),
     },
-    # ── Visit 5 ────────────────────────────────────────────────────────────────
+    # ── Record 5 ────────────────────────────────────────────────────────────────
     {
         "doctor_type": "endocrinology",
-        "visit_at": date(2026, 3, 5),
+        "history_date": date(2026, 3, 5),
         "subjective": (
             "Reports persistent thirst and increased urination over the past 2 months. "
             "Self-referred, suspecting diabetes due to family history. Also mentions dry mouth "
@@ -138,10 +138,10 @@ VISITS: list[dict] = [
             "Follow-up in 3 weeks with lab results."
         ),
     },
-    # ── Visit 6 ────────────────────────────────────────────────────────────────
+    # ── Record 6 ────────────────────────────────────────────────────────────────
     {
         "doctor_type": "cardiology",
-        "visit_at": date(2026, 3, 15),
+        "history_date": date(2026, 3, 15),
         "subjective": (
             "Blood pressure is better controlled on Amlodipine, patient satisfied. However, "
             "reports worsening 'bone pain' in both legs, described as a deep aching, worse at night. "
@@ -161,10 +161,10 @@ VISITS: list[dict] = [
             "Next cardiac review in 3 months."
         ),
     },
-    # ── Visit 7 ────────────────────────────────────────────────────────────────
+    # ── Record 7 ────────────────────────────────────────────────────────────────
     {
         "doctor_type": "mental_health",
-        "visit_at": date(2026, 3, 25),
+        "history_date": date(2026, 3, 25),
         "subjective": (
             "Patient reports Sertraline has not significantly improved fatigue after 8 weeks. "
             "States 'I feel like my bones are breaking from the inside.' Sleep has improved slightly "
@@ -185,10 +185,10 @@ VISITS: list[dict] = [
             "Coordinate with GP."
         ),
     },
-    # ── Visit 8 ────────────────────────────────────────────────────────────────
+    # ── Record 8 ────────────────────────────────────────────────────────────────
     {
         "doctor_type": "nephrology",
-        "visit_at": date(2026, 2, 5),
+        "history_date": date(2026, 2, 5),
         "subjective": (
             "Second acute episode of left-sided flank pain this year. Rates pain 7/10. "
             "Has been drinking adequate fluids as previously instructed. No fever."
@@ -209,10 +209,10 @@ VISITS: list[dict] = [
             "started for stone passage. Urgent results to be reviewed within 1 week."
         ),
     },
-    # ── Visit 9 ────────────────────────────────────────────────────────────────
+    # ── Record 9 ────────────────────────────────────────────────────────────────
     {
         "doctor_type": "endocrinology",
-        "visit_at": date(2026, 2, 15),
+        "history_date": date(2026, 2, 15),
         "subjective": (
             "Review of lab results ordered by Nephrology. Patient is aware results are pending. "
             "Continues to have bone pain, fatigue, constipation, and has now noticed increased urination."
@@ -234,10 +234,10 @@ VISITS: list[dict] = [
             "Thiazide diuretics held/avoided due to risk of worsening hypercalcemia."
         ),
     },
-    # ── Visit 10 ───────────────────────────────────────────────────────────────
+    # ── Record 10 ───────────────────────────────────────────────────────────────
     {
         "doctor_type": "endocrinology",
-        "visit_at": date(2026, 2, 28),
+        "history_date": date(2026, 2, 28),
         "subjective": (
             "Referred for hypercalcemia workup. On reviewing the full history, patient endorses "
             "the classical tetrad: 'Stones' (recurrent kidney stones), 'Bones' (deep bone pain), "
@@ -284,16 +284,15 @@ async def seed() -> None:
         await conn.run_sync(Base.metadata.create_all)
 
     async with session_factory() as session:
-        for i, visit_data in enumerate(VISITS, start=1):
-            visit_id = uuid.uuid4()
+        for record_data in RECORDS:
             await session.execute(
-                insert(Visit).values(
-                    id=visit_id,
+                insert(PatientHistory).values(
+                    id=uuid.uuid4(),
                     user_id=USER_ID,
-                    **visit_data,
+                    **record_data,
                 )
             )
-            await session.commit()
+        await session.commit()
 
     await engine.dispose()
 

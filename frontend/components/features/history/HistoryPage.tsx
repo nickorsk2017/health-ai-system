@@ -9,7 +9,7 @@ import { useRole } from "@/contexts/RoleContext";
 
 import AddHistoryByPromptModal from "./AddHistoryByPromptModal";
 import HistoryList from "./HistoryList";
-import VisitForm from "./VisitForm";
+import PatientHistoryForm from "./PatientHistoryForm";
 
 export default function HistoryPage() {
   const { role } = useRole();
@@ -50,7 +50,7 @@ export default function HistoryPage() {
       {promptSuccess && (
         <Alert
           variant="success"
-          message="Visit records saved successfully. The history list has been refreshed."
+          message="Records saved successfully. The history list has been refreshed."
           onDismiss={() => setPromptSuccess(false)}
         />
       )}
@@ -59,7 +59,7 @@ export default function HistoryPage() {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <Card className="p-6">
             <h2 className="mb-4 text-base font-semibold text-slate-700">New Visit</h2>
-            <VisitForm />
+            <PatientHistoryForm />
           </Card>
           <Card className="p-6">
             <h2 className="mb-4 text-base font-semibold text-slate-700">Visit Records</h2>
