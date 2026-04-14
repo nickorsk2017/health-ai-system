@@ -12,7 +12,7 @@ from routers.diagnosis_router import router as diagnosis_router
 from routers.patient_history_router import router as patient_history_router
 from routers.patients_router import router as patients_router
 
-app = FastAPI(title="Personal Health OS Gateway")
+app = FastAPI(title="AI Health System Gateway")
 
 app.add_middleware(
     CORSMiddleware,

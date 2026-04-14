@@ -1,0 +1,12 @@
+**/.venv/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/node_modules/
+**/.next/
+**/.env
+**/*.log
+**/.DS_Store
+**/.pytest_cache/
+**/.mypy_cache/
+**/mcp.log

@@ -13,7 +13,7 @@ export default function RoleSelectionOverlay({ onSelect }: Props) {
         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600">
           <Activity className="h-7 w-7 text-white" />
         </div>
-        <h1 className="text-2xl font-bold text-white">Personal Health OS</h1>
+        <h1 className="text-2xl font-bold text-white">AI Health System</h1>
         <p className="text-sm text-slate-400">Choose your access mode to continue</p>
       </div>
 

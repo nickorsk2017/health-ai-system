@@ -6,7 +6,7 @@ import AppShell from "@/components/layout/AppShell/AppShell";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Personal Health OS",
+  title: "AI Health System",
   description: "AI-powered health assistant gateway",
 };
 

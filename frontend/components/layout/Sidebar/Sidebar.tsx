@@ -47,7 +47,7 @@ export default function Sidebar() {
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600">
           <Activity className="h-4 w-4 text-white" />
         </div>
-        <span className="text-sm font-semibold text-slate-800">Health OS</span>
+        <span className="text-sm font-semibold text-slate-800">AI Health System</span>
       </div>
 
       <nav className="flex flex-1 flex-col gap-0.5 p-3">

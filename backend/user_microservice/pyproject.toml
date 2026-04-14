@@ -1,7 +1,7 @@
 [project]
 name = "user-microservice"
 version = "0.1.0"
-description = "Personal Health OS — Patient user microservice."
+description = "AI Health System — Patient user microservice."
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115.0",

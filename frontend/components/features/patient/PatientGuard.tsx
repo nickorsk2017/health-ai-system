@@ -40,7 +40,7 @@ export default function PatientGuard() {
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600">
               <Activity className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-lg font-semibold text-slate-800">Personal Health OS</h1>
+            <h1 className="text-lg font-semibold text-slate-800">AI Health System</h1>
             <p className="text-sm text-slate-500">
               Please select or add a patient to continue.
             </p>
