@@ -25,10 +25,11 @@ type Props = {
   isOpen: boolean;
   complaint: Entity.Complaint;
   doctorUserId: string;
+  isDoctor: boolean;
   onClose: () => void;
 };
 
-export default function ComplaintDetailModal({ isOpen, complaint, doctorUserId, onClose }: Props) {
+export default function ComplaintDetailModal({ isOpen, complaint, doctorUserId, isDoctor, onClose }: Props) {
   const { markRead } = useComplaintStore();
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
 
@@ -61,25 +62,27 @@ export default function ComplaintDetailModal({ isOpen, complaint, doctorUserId, 
             <p className="text-sm text-slate-700">{complaint.problem_health}</p>
           </div>
 
-          <div className="flex justify-end gap-2 pt-1">
-            {complaint.status === "unread" && (
-              <Button variant="secondary" onClick={handleMarkRead}>
-                <CheckCircle className="h-4 w-4" />
-                Mark as Read
-              </Button>
-            )}
-            {complaint.status !== "appointment" && (
-              <Button onClick={() => setIsScheduleOpen(true)}>
-                <CalendarPlus className="h-4 w-4" />
-                Schedule Appointment
-              </Button>
-            )}
-            {complaint.status === "appointment" && (
-              <Button variant="secondary" onClick={onClose}>
-                Close
-              </Button>
-            )}
-          </div>
+          {isDoctor && (
+            <div className="flex justify-end gap-2 pt-1">
+              {complaint.status === "unread" && (
+                <Button variant="secondary" onClick={handleMarkRead}>
+                  <CheckCircle className="h-4 w-4" />
+                  Mark as Read
+                </Button>
+              )}
+              {complaint.status !== "appointment" && (
+                <Button onClick={() => setIsScheduleOpen(true)}>
+                  <CalendarPlus className="h-4 w-4" />
+                  Schedule Appointment
+                </Button>
+              )}
+              {complaint.status === "appointment" && (
+                <Button variant="secondary" onClick={onClose}>
+                  Close
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </Modal>
 

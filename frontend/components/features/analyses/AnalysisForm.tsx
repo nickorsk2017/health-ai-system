@@ -11,7 +11,7 @@ import { usePatientStore } from "@/stores/usePatientStore";
 
 const TODAY = new Date().toISOString().split("T")[0];
 
-const EMPTY = { date: TODAY, analysis: "" };
+const EMPTY = { analysis_date: TODAY, analysis_text: "" };
 
 export default function AnalysisForm() {
   const { selectedPatientId } = usePatientStore();
@@ -22,7 +22,7 @@ export default function AnalysisForm() {
   const set = (key: keyof typeof EMPTY, value: string) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSuccess(false);
     const ok = await submitAnalysis({ ...form, user_id: selectedPatientId! });
@@ -37,17 +37,17 @@ export default function AnalysisForm() {
       <Input
         label="Analysis Date"
         type="date"
-        value={form.date}
+        value={form.analysis_date}
         max={TODAY}
-        onChange={(v) => set("date", v)}
+        onChange={(v) => set("analysis_date", v)}
         className="w-48"
       />
       <TextArea
         label="Lab Results"
-        value={form.analysis}
+        value={form.analysis_text}
         rows={7}
         placeholder="Paste or type lab results here, e.g. Glucose: 105 mg/dL, HbA1c: 5.7%, Calcium: 11.2 mg/dL..."
-        onChange={(v) => set("analysis", v)}
+        onChange={(v) => set("analysis_text", v)}
       />
       {submitError && <Alert message={submitError} onDismiss={clearSubmitError} />}
       {success && (
@@ -60,7 +60,7 @@ export default function AnalysisForm() {
       <Button
         type="submit"
         loading={isSubmitting}
-        disabled={!form.analysis.trim()}
+        disabled={!form.analysis_text.trim()}
         className="self-end"
       >
         Save Analysis

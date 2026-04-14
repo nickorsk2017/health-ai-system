@@ -14,7 +14,7 @@ Records a new consultation.
 | `subjective`  | string | yes      | Patient complaints and history |
 | `objective`   | string | yes      | Clinical findings and vitals |
 | `assessment`  | string | yes      | Diagnosis or clinical impression |
-| `visit_at`  | string | yes      | ISO 8601 date (`YYYY-MM-DD`) |
+| `history_date`  | string | yes      | ISO 8601 date (`YYYY-MM-DD`) |
 | `user_id`     | string | yes      | Patient identifier |
 | `plan`        | string | no       | Treatment plan or next steps |
 
@@ -43,7 +43,7 @@ CREATE TABLE visits (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id      VARCHAR(255) NOT NULL,
     doctor_type  VARCHAR(50)  NOT NULL,
-    visit_at   DATE         NOT NULL,
+    history_date DATE         NOT NULL,
     subjective   TEXT         NOT NULL,
     objective    TEXT         NOT NULL,
     assessment   TEXT         NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE visits (
 
 CREATE INDEX ON visits (user_id);
 CREATE INDEX ON visits (doctor_type);
-CREATE INDEX ON visits (visit_at);
+CREATE INDEX ON visits (history_date);
 ```
 
 Tables are created automatically on agent startup via SQLAlchemy `create_all`.

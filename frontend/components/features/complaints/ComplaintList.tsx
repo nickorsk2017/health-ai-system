@@ -154,6 +154,7 @@ export default function ComplaintList({ userId, isDoctor = false }: Props) {
           isOpen
           complaint={selected}
           doctorUserId={userId}
+          isDoctor={isDoctor}
           onClose={() => setSelected(null)}
         />
       )}

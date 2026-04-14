@@ -5,13 +5,7 @@ from pydantic import BaseModel
 ComplaintStatus = Literal["unread", "read", "appointment"]
 
 
-class CreateComplaintSchema(BaseModel):
-    user_id: str
-    problem_health: str
-    date_public: str
-
-
-class UpdateComplaintSchema(BaseModel):
+class UpsertComplaintSchema(BaseModel):
     user_id: str
     problem_health: str
     date_public: str

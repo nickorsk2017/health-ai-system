@@ -15,6 +15,7 @@ from services.agent_result import AgentResult, to_response
 
 async def record_patient_history(data: CreatePatientHistorySchema) -> AgentResult:
     try:
+        print("record_patient_history input data:", data)   
         async with Client(settings.client_history_agent_url) as client:
             response = await client.call_tool(
                 "add_patient_history",
@@ -30,7 +31,8 @@ async def record_patient_history(data: CreatePatientHistorySchema) -> AgentResul
                     }
                 },
             )
-        raw_results = response.structured_content or {}
+        raw_results = response.structured_content;
+        print("record_patient_history raw_results:", raw_results)
         if not raw_results.get("success"):
             return to_response(error="client_history_agent returned failure on add_patient_history")
         return to_response(data=RecordPatientHistoryResponseSchema(

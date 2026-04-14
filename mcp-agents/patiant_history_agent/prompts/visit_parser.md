@@ -35,5 +35,5 @@ Return a JSON object with a `visits` array. Each element represents one distinct
 1. Extract ALL visits from the text — there may be multiple visits on different dates or with different specialists.
 2. Do not merge separate visits even if they are from the same specialty.
 3. Every SOAP field must have a value — never leave a field empty or null; use `Data not provided` for missing data.
-4. Keep `visit_at` in the past or today; never set a future date.
+4. Keep `history_date` in the past or today; never set a future date.
 5. Preserve clinical detail faithfully — do not paraphrase or omit specifics.

@@ -1,8 +1,8 @@
 declare namespace Entity {
   type CreateAnalysis = {
     user_id: string;
-    analysis: string;
-    date: string;
+    analysis_text: string;
+    analysis_date: string;
   };
 
   type AnalysisRecord = {

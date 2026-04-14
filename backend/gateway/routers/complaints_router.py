@@ -1,27 +1,21 @@
 from fastapi import APIRouter, HTTPException, Query
 
-from schemas.complaint_schema import (
-    ComplaintRecordSchema,
-    CreateComplaintSchema,
-    UpdateComplaintSchema,
-)
+from schemas.complaint_schema import UpsertComplaintSchema, ComplaintRecordSchema
 from services.complaint_service import (
-    create_complaint,
     fetch_complaints,
     mark_complaint_read,
     remove_complaint,
-    update_complaint,
+    upsert_complaint,
 )
 
 router = APIRouter(prefix="/api/v1/complaints", tags=["complaints"])
 
 
-@router.post("", response_model=ComplaintRecordSchema, status_code=201)
-async def add_complaint(body: CreateComplaintSchema) -> ComplaintRecordSchema:
-    agent_result = await create_complaint(body)
+@router.post("", status_code=201)
+async def add_complaint(body: UpsertComplaintSchema) -> None:
+    agent_result = await upsert_complaint(None, body)
     if not agent_result["success"]:
         raise HTTPException(status_code=503, detail=agent_result["error"])
-    return agent_result["data"]
 
 
 @router.get("", response_model=list[ComplaintRecordSchema])
@@ -32,12 +26,11 @@ async def list_complaints(user_id: str = Query(default="")) -> list[ComplaintRec
     return agent_result["data"]
 
 
-@router.patch("/{complaint_id}", response_model=ComplaintRecordSchema)
-async def edit_complaint(complaint_id: str, body: UpdateComplaintSchema) -> ComplaintRecordSchema:
-    agent_result = await update_complaint(complaint_id, body)
+@router.patch("/{complaint_id}", status_code=204)
+async def edit_complaint(complaint_id: str, body: UpsertComplaintSchema) -> None:
+    agent_result = await upsert_complaint(complaint_id, body)
     if not agent_result["success"]:
         raise HTTPException(status_code=503, detail=agent_result["error"])
-    return agent_result["data"]
 
 
 @router.patch("/{complaint_id}/read", status_code=204)

@@ -34,7 +34,7 @@ HistoryDate = Annotated[
 
 
 class PatientHistoryRecord(BaseModel):
-    history_id: str | None = Field(description="Unique identifier for the patient history record.")
+    history_id: str | None = Field(default=None, description="Unique identifier for the patient history record.")
     user_id: str = Field(description="Identifier of the patient.")
     doctor_type: DoctorType = Field(description="Medical specialty of the consulted physician.")
     history_date: HistoryDate

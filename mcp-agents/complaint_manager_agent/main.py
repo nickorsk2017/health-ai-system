@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
+from typing import Any, AsyncIterator
 
 from fastmcp import FastMCP
 from loguru import logger
@@ -40,6 +40,8 @@ async def upsert_complaint(data: UpsertComplaintRequest) -> dict:
         date_public: Date the complaint was reported (ISO format YYYY-MM-DD).
         complaint_id: If provided, updates the existing complaint instead of creating one.
     """
+
+    print(f"Received upsert_complaint request: {data}")
     result = await _upsert_complaint(data)
     return result.model_dump()
 

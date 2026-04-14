@@ -18,7 +18,7 @@ async def get_patient_history(
         select(PatientHistory)
         .where(PatientHistory.user_id == data.user_id)
         .where(PatientHistory.history_date >= data.last_history_date)
-        .order_by(PatientHistory.history_date.asc())
+        .order_by(PatientHistory.history_date.desc())
     )
 
     if data.doctor_type is not None and data.doctor_type != "":

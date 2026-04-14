@@ -1,68 +1,27 @@
 from fastmcp import Client
 
 from config import settings
-from schemas.complaint_schema import (
-    ComplaintRecordSchema,
-    CreateComplaintSchema,
-    UpdateComplaintSchema,
-)
+from schemas.complaint_schema import ComplaintRecordSchema, UpsertComplaintSchema
 from services.agent_result import AgentResult, to_response
 
 
-async def create_complaint(data: CreateComplaintSchema) -> AgentResult:
+async def upsert_complaint(complaint_id: str | None, data: UpsertComplaintSchema) -> AgentResult:
     try:
+        payload: dict = {
+            "user_id": data.user_id,
+            "problem_health": data.problem_health,
+            "date_public": data.date_public,
+        }
+        if complaint_id:
+            payload["complaint_id"] = complaint_id
+
         async with Client(settings.complaint_manager_agent_url) as client:
-            response = await client.call_tool(
-                "upsert_complaint",
-                {
-                    "data": {
-                        "user_id": data.user_id,
-                        "problem_health": data.problem_health,
-                        "date_public": data.date_public,
-                    }
-                },
-            )
+            response = await client.call_tool("upsert_complaint", {"data": payload})
+
         raw_results = response.structured_content or {}
         if not raw_results.get("success"):
             return to_response(error="complaint_manager_agent returned failure on upsert_complaint")
-
-        complaint_id = raw_results["complaint_id"]
-        fetch_result = await fetch_complaints("")
-        if not fetch_result["success"]:
-            return fetch_result
-        complaint = next((c for c in fetch_result["data"] if c.complaint_id == complaint_id), None)
-        if not complaint:
-            return to_response(error=f"Complaint {complaint_id} not found after create")
-        return to_response(data=complaint)
-    except Exception as exc:
-        return to_response(error=str(exc))
-
-
-async def update_complaint(complaint_id: str, data: UpdateComplaintSchema) -> AgentResult:
-    try:
-        async with Client(settings.complaint_manager_agent_url) as client:
-            response = await client.call_tool(
-                "upsert_complaint",
-                {
-                    "data": {
-                        "complaint_id": complaint_id,
-                        "user_id": data.user_id,
-                        "problem_health": data.problem_health,
-                        "date_public": data.date_public,
-                    }
-                },
-            )
-        raw_results = response.structured_content or {}
-        if not raw_results.get("success"):
-            return to_response(error=f"Complaint {complaint_id} not found")
-
-        fetch_result = await fetch_complaints("")
-        if not fetch_result["success"]:
-            return fetch_result
-        complaint = next((c for c in fetch_result["data"] if c.complaint_id == complaint_id), None)
-        if not complaint:
-            return to_response(error=f"Complaint {complaint_id} not found after update")
-        return to_response(data=complaint)
+        return to_response()
     except Exception as exc:
         return to_response(error=str(exc))
 
@@ -74,8 +33,10 @@ async def fetch_complaints(user_id: str) -> AgentResult:
                 "get_complaints",
                 {"data": {"user_id": user_id}},
             )
-        raw_results = response.structured_content
-        complaints_collection = raw_results if isinstance(raw_results, list) else []
+        response_content = response.structured_content
+        complaints_collection = (
+            response_content.get("result") if isinstance(response_content, dict) else None
+        )
         return to_response(data=[ComplaintRecordSchema(**c) for c in complaints_collection])
     except Exception as exc:
         return to_response(error=str(exc))
