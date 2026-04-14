@@ -1,44 +1,43 @@
 from fastmcp import FastMCP
 from loguru import logger
 
-from services.consilium_client import ConsiliumClient
-from services.synthesis_service import SynthesisService
-from schemas.http import GetSynthesisRequest
 from config import settings
+from schemas.http import SynthesisRequest
+from services.synthesis_service import SynthesisService
 
 logger.add("mcp.log", rotation="10 MB")
 mcp = FastMCP("gp-synthesis-agent")
 
-_consilium_client = ConsiliumClient()
 _synthesis_service = SynthesisService()
 
 
 @mcp.resource("config://model")
 def get_model() -> str:
-    from config import settings
     return f"synthesis_model: {settings.openai_model}"
 
 
-@mcp.tool(name="get_final_gp_consultation")
-async def get_final_gp_consultation(
-    data: GetSynthesisRequest
-) -> dict:
-    """Synthesize multi-specialist consilium findings into a final GP consultation.
+@mcp.tool(name="synthesize_gp_consultation")
+async def synthesize_gp_consultation(data: SynthesisRequest) -> dict:
+    """Synthesize a final GP consultation from pre-fetched multi-source patient context.
 
-    Calls the medical-consilium-agent, routes all specialist findings through a
-    senior GP synthesis LLM, and returns a unified diagnosis, treatment plan,
-    prognosis, and patient-friendly health narrative.
+    Accepts the full clinical picture — specialist consilium findings, SOAP history,
+    laboratory results, device data, and patient complaints — and produces a unified
+    GP diagnosis, treatment plan, prognosis, and patient-facing health narrative.
 
     Args:
-        user_id: Identifier of the patient.
-        start_date_clinic_history: ISO 8601 start date for history retrieval (YYYY-MM-DD).
+        history_records: SOAP patient history records.
+        lab_records: Laboratory analysis records.
+        device_records: Device and wearable data records.
+        complaint_records: Patient complaint records.
+        consilium_findings: Specialist findings from the MDT consilium.
     """
-    logger.info(f"GP consultation requested: user={data.user_id}, from={data.start_date}")
+    logger.info(
+        f"GP synthesis requested: {len(data.consilium_findings)} finding(s), "
+        f"{len(data.history_records)} history record(s)"
+    )
 
-    findings = await _consilium_client.fetch(data.user_id, data.start_date)
-
-    if not findings:
-        logger.warning(f"No consilium findings returned for user={data.user_id}. Returning advisory response.")
+    if not data.consilium_findings:
+        logger.warning("No consilium findings — returning advisory response.")
         return {
             "diagnosis": "Insufficient specialist data to establish a unifying diagnosis.",
             "treatment": (
@@ -55,14 +54,21 @@ async def get_final_gp_consultation(
             ),
         }
 
-    consultation = await _synthesis_service.synthesize(findings, data.analyses or [])
+    consultation = await _synthesis_service.synthesize(
+        history_records=data.history_records,
+        lab_records=data.lab_records,
+        device_records=data.device_records,
+        complaint_records=data.complaint_records,
+        consilium_findings=data.consilium_findings,
+    )
 
-    logger.info(f"GP consultation complete for user={data.user_id}.")
+    logger.info("GP consultation complete.")
     return consultation.model_dump()
 
 
 def run() -> None:
     mcp.run(transport="streamable-http", host=settings.mcp_host, port=settings.mcp_port)
+
 
 def run_inspector() -> None:
     mcp.run()

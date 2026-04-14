@@ -2,8 +2,9 @@ from fastmcp import FastMCP
 from loguru import logger
 
 from config import settings
-from schemas.http import EvaluationRequest
+from schemas.http import EvaluationRequest, GPDiagnosisRequest
 from tools.run_comprehensive_evaluation import run_comprehensive_evaluation as _evaluate
+from tools.run_gp_diagnosis import run_gp_diagnosis as _diagnose
 
 logger.add("mcp.log", rotation="10 MB")
 
@@ -22,6 +23,21 @@ async def run_comprehensive_evaluation(data: EvaluationRequest) -> dict:
         start_date: ISO 8601 start date for data retrieval (YYYY-MM-DD).
     """
     result = await _evaluate(data)
+    return result.model_dump()
+
+
+@mcp.tool(name="run_gp_diagnosis")
+async def run_gp_diagnosis(data: GPDiagnosisRequest) -> dict:
+    """Orchestrate a full GP diagnosis from raw patient data to final consultation.
+
+    Fetches history, labs, device data, and complaints in parallel, runs a
+    multidisciplinary consilium, then synthesizes a unified GP consultation.
+
+    Args:
+        user_id: Identifier of the patient.
+        start_date: ISO 8601 start date for data retrieval (YYYY-MM-DD).
+    """
+    result = await _diagnose(data)
     return result.model_dump()
 
 

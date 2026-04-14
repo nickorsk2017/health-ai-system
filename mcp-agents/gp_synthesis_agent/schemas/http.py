@@ -1,13 +1,24 @@
+from pydantic import BaseModel, Field
 
-from datetime import date
-from pydantic import BaseModel, Field  
 
-class GetSynthesisRequest(BaseModel):
-    user_id: str = Field(description="Identifier of the patient.")
-    start_date: date = Field(
-        description="ISO 8601 start date for history retrieval (YYYY-MM-DD)."
-    )
-    analyses: list[str] = Field(
+class SynthesisRequest(BaseModel):
+    history_records: list[dict] = Field(
         default_factory=list,
-        description="Optional list of laboratory test result texts to include in the synthesis.",
-    )   
+        description="SOAP patient history records from client_history_agent.",
+    )
+    lab_records: list[dict] = Field(
+        default_factory=list,
+        description="Laboratory analysis records from labs_agent.",
+    )
+    device_records: list[dict] = Field(
+        default_factory=list,
+        description="Device and wearable data records from device_orchestrator_agent.",
+    )
+    complaint_records: list[dict] = Field(
+        default_factory=list,
+        description="Patient complaint records from complaint_manager_agent.",
+    )
+    consilium_findings: list[dict] = Field(
+        default_factory=list,
+        description="Specialist findings produced by the MDT consilium.",
+    )

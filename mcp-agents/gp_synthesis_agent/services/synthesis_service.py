@@ -14,10 +14,8 @@ def _load_system_prompt() -> str:
     return _PROMPT_PATH.read_text(encoding="utf-8")
 
 
-def _format_findings(findings: list[dict]) -> str:
-    lines: list[str] = [
-        f"## Consilium Report — {len(findings)} Specialist Finding(s)\n"
-    ]
+def _format_consilium_findings(findings: list[dict]) -> str:
+    lines: list[str] = [f"## Consilium Report — {len(findings)} Specialist Finding(s)\n"]
     for i, finding in enumerate(findings, start=1):
         specialty = finding.get("specialty", "unknown").replace("_", " ").title()
         lines.append(f"### [{i}] {specialty}")
@@ -29,11 +27,54 @@ def _format_findings(findings: list[dict]) -> str:
     return "\n".join(lines)
 
 
-def _format_analyses(analyses: list[str]) -> str:
-    lines: list[str] = [f"## Laboratory Results — {len(analyses)} Record(s)\n"]
-    for i, text in enumerate(analyses, start=1):
-        lines.append(f"### [{i}] Lab Report")
-        lines.append(text)
+def _format_history(records: list[dict]) -> str:
+    if not records:
+        return "## Patient SOAP History\nNot Provided\n"
+    lines: list[str] = [f"## Patient SOAP History — {len(records)} Record(s)\n"]
+    for i, r in enumerate(records, start=1):
+        lines.append(
+            f"### [{i}] {r.get('doctor_type', 'Unknown')} — {r.get('history_date', 'N/A')}"
+        )
+        lines.append(f"**Chief Complaint:** {r.get('chief_complaint', 'N/A')}")
+        lines.append(f"**Subjective:** {r.get('subjective', 'N/A')}")
+        lines.append(f"**Objective:** {r.get('objective', 'N/A')}")
+        lines.append(f"**Assessment:** {r.get('assessment', 'N/A')}")
+        lines.append(f"**Plan:** {r.get('plan', 'N/A')}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def _format_labs(records: list[dict]) -> str:
+    if not records:
+        return "## Laboratory Results\nNot Provided\n"
+    lines: list[str] = [f"## Laboratory Results — {len(records)} Record(s)\n"]
+    for i, r in enumerate(records, start=1):
+        lines.append(f"### [{i}] {r.get('test_name', 'Lab Test')} — {r.get('date', 'N/A')}")
+        lines.append(r.get("analysis", str(r)))
+        lines.append("")
+    return "\n".join(lines)
+
+
+def _format_devices(records: list[dict]) -> str:
+    if not records:
+        return "## Device & Wearable Data\nNot Provided\n"
+    lines: list[str] = [f"## Device & Wearable Data — {len(records)} Device(s)\n"]
+    for i, r in enumerate(records, start=1):
+        lines.append(
+            f"### [{i}] {r.get('device_name', 'Device')} (Type: {r.get('device_type', 'N/A')})"
+        )
+        lines.append(f"**Last Sync:** {r.get('last_sync', 'N/A')}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def _format_complaints(records: list[dict]) -> str:
+    if not records:
+        return "## Patient Complaints\nNot Provided\n"
+    lines: list[str] = [f"## Patient Complaints — {len(records)} Entry(ies)\n"]
+    for i, r in enumerate(records, start=1):
+        lines.append(f"### [{i}] {r.get('created_at', 'N/A')}")
+        lines.append(r.get("complaint", str(r)))
         lines.append("")
     return "\n".join(lines)
 
@@ -46,15 +87,27 @@ class SynthesisService:
             temperature=0.2,
         )
 
-    async def synthesize(self, findings: list[dict], analyses: list[str] | None = None) -> GPConsultation:
-        findings_text = _format_findings(findings)
-        human_content = findings_text
+    async def synthesize(
+        self,
+        history_records: list[dict],
+        lab_records: list[dict],
+        device_records: list[dict],
+        complaint_records: list[dict],
+        consilium_findings: list[dict],
+    ) -> GPConsultation:
+        human_content = "\n\n".join([
+            _format_consilium_findings(consilium_findings),
+            _format_history(history_records),
+            _format_labs(lab_records),
+            _format_devices(device_records),
+            _format_complaints(complaint_records),
+        ])
 
-        if analyses:
-            human_content = f"{findings_text}\n\n{_format_analyses(analyses)}"
-            logger.info(f"Including {len(analyses)} lab result(s) in GP synthesis.")
-
-        logger.info(f"Sending {len(findings)} specialist findings to GP synthesis LLM...")
+        logger.info(
+            f"Sending to GP synthesis LLM: {len(consilium_findings)} finding(s), "
+            f"{len(history_records)} history record(s), {len(lab_records)} lab record(s), "
+            f"{len(device_records)} device record(s), {len(complaint_records)} complaint(s)"
+        )
 
         structured_llm = self._llm.with_structured_output(GPConsultation)
         consultation: GPConsultation = await structured_llm.ainvoke(
