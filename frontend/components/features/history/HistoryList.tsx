@@ -87,6 +87,7 @@ export default function HistoryList() {
   const { history, isFetchingHistory, error, fetchHistory, clearError, refreshTrigger } =
     useVisitStore();
   const { role } = useRole();
+  const fetchHistoryLabel = role === "patient" ? "Get My History" : "Get Patient History";
   const [since, setSince] = useState("2024-01-01");
   const [editingVisit, setEditingVisit] = useState<Entity.VisitRecord | null>(null);
 
@@ -108,7 +109,7 @@ export default function HistoryList() {
           className="w-44"
         />
         <Button loading={isFetchingHistory} onClick={() => fetchHistory(selectedPatientId!, since)}>
-          Get Patient History
+          {fetchHistoryLabel}
         </Button>
       </div>
       {error && <Alert message={error} onDismiss={clearError} />}
@@ -130,7 +131,7 @@ export default function HistoryList() {
       )}
       {!isFetchingHistory && history.length === 0 && !error && (
         <p className="py-6 text-center text-sm text-slate-400">
-          No visits loaded. Select a date range and click &quot;Get Patient History&quot;.
+          No visits loaded. Select a date range and click &quot;{fetchHistoryLabel}&quot;.
         </p>
       )}
       {editingVisit && (

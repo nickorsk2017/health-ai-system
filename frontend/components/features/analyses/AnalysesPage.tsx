@@ -20,7 +20,7 @@ export default function AnalysesPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-xl font-semibold text-slate-800">
-            {isDoctor ? "Laboratory Analyses" : "My Lab Results"}
+            {isDoctor ? "Laboratory Analysis" : "My Lab Results"}
           </h1>
           <p className="mt-1 text-sm text-slate-500">
             {isDoctor

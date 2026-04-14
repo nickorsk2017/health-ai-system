@@ -32,7 +32,9 @@ export const usePatientStore = create<State>((set) => ({
 
   init: async () => {
     const storedId =
-      typeof window !== "undefined" ? localStorage.getItem(SELECTED_KEY) : null;
+      typeof window !== "undefined"
+        ? localStorage.getItem(SELECTED_KEY) ?? localStorage.getItem(PATIENT_KEY)
+        : null;
     try {
       const patients = await PatientService.getAll();
       const selectedPatientId =

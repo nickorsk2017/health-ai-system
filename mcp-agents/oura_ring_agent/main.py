@@ -12,21 +12,24 @@ def get_config() -> str:
 
 
 @mcp.tool(name="get_daily_oura_biometrics")
-async def get_daily_oura_biometrics(date: str, user_id: str) -> list[dict]:
+async def get_daily_oura_biometrics(date: str, user_id: str, diagnosis_mock: str = "") -> list[dict]:
     """Return synthetic Oura Ring daily biometrics from a start date to today.
 
     Args:
         date: ISO 8601 start date (YYYY-MM-DD).
         user_id: Identifier of the user whose data is requested.
+        diagnosis_mock: Optional diagnosis name to simulate condition-specific biometrics
+            (e.g. "Pheochromocytoma"). Leave empty for healthy baseline data.
     """
-    
-    records = await _get_daily_oura_biometrics(date, user_id)
+    records = await _get_daily_oura_biometrics(date, user_id, diagnosis_mock or None)
     return [r.model_dump() for r in records]
 
 
 def run() -> None:
-    mcp.run()
+    mcp.run(transport="streamable-http", host=settings.mcp_host, port=settings.mcp_port)
 
+def run_inspector() -> None:
+    mcp.run()
 
 if __name__ == "__main__":
     run()

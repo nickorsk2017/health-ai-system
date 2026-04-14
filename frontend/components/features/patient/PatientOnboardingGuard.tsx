@@ -9,13 +9,14 @@ import PatientRegistrationModal from "./PatientRegistrationModal";
 const PATIENT_KEY = "health_os_patient_id";
 
 export default function PatientOnboardingGuard() {
-  const { setSelectedPatientIdSilent } = usePatientStore();
+  const { setSelectedPatientIdSilent, init } = usePatientStore();
   const [showRegistration, setShowRegistration] = useState(false);
 
   useEffect(() => {
     const storedId = localStorage.getItem(PATIENT_KEY);
     if (storedId) {
       setSelectedPatientIdSilent(storedId);
+      void init();
     } else {
       setShowRegistration(true);
     }

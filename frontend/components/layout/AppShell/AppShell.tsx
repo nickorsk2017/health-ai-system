@@ -8,6 +8,7 @@ import PatientOnboardingGuard from "@/components/features/patient/PatientOnboard
 import RoleSelectionOverlay from "@/components/features/role/RoleSelectionOverlay";
 import Sidebar from "@/components/layout/Sidebar/Sidebar";
 import TopBar from "@/components/layout/TopBar/TopBar";
+import LoggedInPatientName from "@/components/features/patient/LoggedInPatientName";
 import PatientSelector from "@/components/features/patient/PatientSelector";
 import { RoleContext } from "@/contexts/RoleContext";
 
@@ -60,7 +61,9 @@ export default function AppShell({ children }: Props) {
               <PatientSelector />
             </TopBar>
           ) : (
-            <TopBar />
+            <TopBar>
+              <LoggedInPatientName />
+            </TopBar>
           )}
           <main className="flex-1 overflow-y-auto p-6">{children}</main>
         </div>

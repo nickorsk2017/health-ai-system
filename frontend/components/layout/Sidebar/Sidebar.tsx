@@ -5,11 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Activity,
-  ArrowLeftRight,
   ClipboardList,
   FlaskConical,
   LogOut,
   Stethoscope,
+  Watch,
 } from "lucide-react";
 
 import { useRole } from "@/contexts/RoleContext";
@@ -17,7 +17,7 @@ import cx from "@/utils/cx";
 
 const DOCTOR_NAV = [
   { href: "/history", label: "Clinic History", icon: ClipboardList },
-  { href: "/analyses", label: "Lab Analyses", icon: FlaskConical },
+  { href: "/analyses", label: "Lab Analysis", icon: FlaskConical },
   { href: "/consilium", label: "AI Consilium", icon: Activity },
   { href: "/diagnosis", label: "AI Diagnosis PB", icon: Stethoscope },
 ];
@@ -25,7 +25,7 @@ const DOCTOR_NAV = [
 const PATIENT_NAV = [
   { href: "/history", label: "My Health History", icon: ClipboardList },
   { href: "/analyses", label: "My Lab Results", icon: FlaskConical },
-  { href: "/diagnosis", label: "My Diagnosis", icon: Stethoscope },
+  { href: "/devices", label: "My Devices", icon: Watch },
 ];
 
 export default function Sidebar() {
@@ -34,13 +34,6 @@ export default function Sidebar() {
   const [confirmingLogout, setConfirmingLogout] = useState(false);
 
   const navItems = role === "patient" ? PATIENT_NAV : DOCTOR_NAV;
-
-  const handleSwitchRole = () => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("app_role");
-      window.location.reload();
-    }
-  };
 
   return (
     <aside className="flex h-screen w-56 shrink-0 flex-col border-r border-slate-200 bg-white">
@@ -96,24 +89,14 @@ export default function Sidebar() {
             </div>
           </div>
         ) : (
-          <>
-            <button
-              type="button"
-              onClick={handleSwitchRole}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
-            >
-              <ArrowLeftRight className="h-3.5 w-3.5" />
-              Switch Role
-            </button>
-            <button
-              type="button"
-              onClick={() => setConfirmingLogout(true)}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              Log Out
-            </button>
-          </>
+          <button
+            type="button"
+            onClick={() => setConfirmingLogout(true)}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Log Out
+          </button>
         )}
       </div>
     </aside>

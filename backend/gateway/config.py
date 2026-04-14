@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     gp_synthesis_agent_url: str
     analysis_agent_url: str
     user_service_url: str
+    device_orchestrator_agent_url: str
 
     cors_origins: list[str] = ["http://localhost:3000"]
 

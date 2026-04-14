@@ -93,6 +93,8 @@ export default function AnalysisList() {
   const { analyses, isFetching, fetchError, fetchAnalyses, clearFetchError, refreshTrigger } =
     useAnalysisStore();
   const { role } = useRole();
+  const fetchAnalysesLabel =
+    role === "patient" ? "Get My Analysis" : "Get Patient Analysis";
   const [since, setSince] = useState(() => {
     const d = new Date();
     d.setMonth(d.getMonth() - 6);
@@ -125,7 +127,7 @@ export default function AnalysisList() {
           className="w-44"
         />
         <Button loading={isFetching} onClick={() => fetchAnalyses(selectedPatientId!, since)}>
-          Refresh
+          {fetchAnalysesLabel}
         </Button>
       </div>
 

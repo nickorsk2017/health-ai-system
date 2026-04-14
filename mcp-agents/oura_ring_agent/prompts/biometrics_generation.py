@@ -32,11 +32,35 @@ REALISM RULES
 """
 
 
-def user_prompt(user_id: str, dates: list[str]) -> str:
+def diagnosis_system_prompt(diagnosis: str) -> str:
+    return f"""You are a synthetic health data generator simulating an Oura Ring wearable device.
+You are generating data for a patient with a confirmed diagnosis of: {diagnosis}.
+
+Your output must reflect the physiological effects of this condition on wearable biometrics.
+Apply the condition-specific rules below — override the healthy baselines as needed:
+
+GENERAL BOUNDS
+- Total sleep: 3.0-9.0 h, REM: 5-25% of total, Deep: 5-20% of total, Efficiency: 50-97%
+- Steps: 1,000-15,000, Distance: steps × 0.00075 km, Active kcal: steps × 0.04
+- HRV (RMSSD): 10-95 ms, Resting HR: 42-160 BPM, Body temp deviation: -0.5 to +1.5 °C
+- Stress score: 10-100, Recovery score: 10-98
+
+CONDITION-SPECIFIC OVERRIDES FOR {diagnosis.upper()}
+Apply the known physiological markers of {diagnosis}:
+- Pheochromocytoma → episodic HR spikes (120-160 BPM), HRV 10-30 ms, sleep efficiency 45-70%,
+  elevated stress score (65-95), body temp +0.5 to +1.5 °C, recovery score 10-40 on crisis days.
+- Autoimmune / inflammatory → elevated temperature, reduced activity, elevated stress.
+- Cardiac conditions → suppressed HRV baseline, elevated resting HR.
+Include 1-2 "crisis" days per week with dramatically abnormal readings for {diagnosis}.
+Never return clinically impossible values (e.g., REM > total sleep).
+"""
+
+
+def user_prompt(user_id: str, dates: list[str], diagnosis_mock: str | None = None) -> str:
+    condition_note = f" The patient has {diagnosis_mock}." if diagnosis_mock else ""
     return (
-        f"Generate synthetic Oura Ring daily biometrics for user '{user_id}' "
+        f"Generate synthetic Oura Ring daily biometrics for user '{user_id}'{condition_note} "
         f"for the following dates: {dates}.\n"
         "Return a JSON object with a single key 'records' containing an array of daily entries. "
         "Each entry must match the DailyBiometrics schema exactly."
-        
     )
