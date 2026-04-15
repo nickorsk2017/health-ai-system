@@ -1,7 +1,7 @@
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import String
+from sqlalchemy import DateTime, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from db.engine import Base
@@ -15,4 +15,6 @@ class Patient(Base):
     dob: Mapped[date]
     gender: Mapped[str] = mapped_column(String(10))
     email: Mapped[str | None] = mapped_column(String(200), nullable=True, unique=True, index=True)
-    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )

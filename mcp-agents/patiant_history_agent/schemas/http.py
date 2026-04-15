@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 from schemas.patient_history import PatientHistoryRecord
@@ -14,9 +14,9 @@ class GetPatientHistoryResponse(BaseModel):
 
 
 class GetPatientHistoryRequest(BaseModel):
-    last_history_date: date = Field(
-        description="YYYY-MM-DD, Date of the medical visit in ISO 8601 format (YYYY-MM-DD). Must be today or in the past.",
-        format="date",
+    last_history_date: datetime = Field(
+        description="ISO 8601 UTC datetime lower bound for medical visits.",
+        format="date-time",
     )
     user_id: str
     doctor_type: str = Field(
@@ -37,7 +37,7 @@ class CreateHistoryFromPromptResponse(BaseModel):
 
 class UpdatePatientHistoryRequest(BaseModel):
     history_id: str = Field(description="UUID of the patient history record to update.")
-    history_date: date = Field(description="ISO 8601 date of the consultation (YYYY-MM-DD).")
+    history_date: datetime = Field(description="ISO 8601 UTC datetime of the consultation.")
     subjective: str = Field(description="Patient complaints, history, and symptoms.")
     objective: str = Field(description="Clinical findings, vitals, and examination results.")
     assessment: str = Field(description="Clinical impression or diagnosis.")

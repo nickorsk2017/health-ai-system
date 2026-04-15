@@ -1,5 +1,5 @@
 import uuid
-from datetime import date
+from datetime import timezone
 
 from loguru import logger
 from sqlalchemy import select, update
@@ -7,16 +7,6 @@ from sqlalchemy import select, update
 from db.engine import SessionLocal
 from db.models import PatientAnalysis as PatientAnalysisRow
 from schemas.http import UpdateAnalysisRequest, UpdateAnalysisResponse
-
-
-def _parse_date(raw: str | None) -> date | None:
-    if not raw or not raw.strip():
-        return None
-    try:
-        parsed = date.fromisoformat(raw.strip())
-        return min(parsed, date.today())
-    except ValueError:
-        return None
 
 
 async def update_analysis(data: UpdateAnalysisRequest) -> UpdateAnalysisResponse:
@@ -40,7 +30,10 @@ async def update_analysis(data: UpdateAnalysisRequest) -> UpdateAnalysisResponse
         if data.analysis_text is not None:
             values["analysis_text"] = data.analysis_text.strip() or None
         if data.analysis_date is not None:
-            values["analysis_date"] = _parse_date(data.analysis_date)
+            if data.analysis_date.tzinfo is None:
+                values["analysis_date"] = data.analysis_date.replace(tzinfo=timezone.utc)
+            else:
+                values["analysis_date"] = data.analysis_date.astimezone(timezone.utc)
 
         if values:
             await session.execute(

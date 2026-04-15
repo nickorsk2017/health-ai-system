@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 from _common.models.visit import DoctorType, PatientHistoryRecord
@@ -10,7 +12,7 @@ PatientHistoryRecordSchema = PatientHistoryRecord
 class CreatePatientHistorySchema(BaseModel):
     user_id: str = Field(description="Patient identifier.")
     doctor_type: DoctorType
-    history_date: str = Field(description="ISO 8601 date of the consultation (YYYY-MM-DD).")
+    history_date: datetime = Field(description="ISO 8601 UTC datetime of the consultation.")
     subjective: str = Field(description="Patient complaints, history, and symptoms.")
     objective: str = Field(description="Clinical findings, vitals, and examination results.")
     assessment: str = Field(description="Clinical impression or diagnosis.")
@@ -33,7 +35,7 @@ class HistoryFromPromptResponseSchema(BaseModel):
 
 
 class UpdatePatientHistorySchema(BaseModel):
-    history_date: str = Field(description="ISO 8601 date of the consultation (YYYY-MM-DD).")
+    history_date: datetime = Field(description="ISO 8601 UTC datetime of the consultation.")
     subjective: str
     objective: str
     assessment: str

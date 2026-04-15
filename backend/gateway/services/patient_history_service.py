@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastmcp import Client
 
 from config import settings
@@ -14,8 +16,12 @@ from services.agent_result import AgentResult, to_response
 
 
 async def record_patient_history(data: CreatePatientHistorySchema) -> AgentResult:
+    history_date = data.history_date
+    if history_date.tzinfo is None:
+        history_date = history_date.replace(tzinfo=timezone.utc)
+    else:
+        history_date = history_date.astimezone(timezone.utc)
     try:
-        print("record_patient_history input data:", data)   
         async with Client(settings.client_history_agent_url) as client:
             response = await client.call_tool(
                 "add_patient_history",
@@ -23,7 +29,7 @@ async def record_patient_history(data: CreatePatientHistorySchema) -> AgentResul
                     "data": {
                         "user_id": data.user_id,
                         "doctor_type": data.doctor_type.value,
-                        "history_date": data.history_date,
+                        "history_date": history_date.isoformat(),
                         "subjective": data.subjective,
                         "objective": data.objective,
                         "assessment": data.assessment,
@@ -31,8 +37,7 @@ async def record_patient_history(data: CreatePatientHistorySchema) -> AgentResul
                     }
                 },
             )
-        raw_results = response.structured_content;
-        print("record_patient_history raw_results:", raw_results)
+        raw_results = response.structured_content
         if not raw_results.get("success"):
             return to_response(error="client_history_agent returned failure on add_patient_history")
         return to_response(data=RecordPatientHistoryResponseSchema(
@@ -43,12 +48,16 @@ async def record_patient_history(data: CreatePatientHistorySchema) -> AgentResul
         return to_response(error=str(exc))
 
 
-async def fetch_patient_history(user_id: str, last_history_date: str) -> AgentResult:
+async def fetch_patient_history(user_id: str, last_history_date: datetime) -> AgentResult:
+    if last_history_date.tzinfo is None:
+        last_history_date = last_history_date.replace(tzinfo=timezone.utc)
+    else:
+        last_history_date = last_history_date.astimezone(timezone.utc)
     try:
         async with Client(settings.client_history_agent_url) as client:
             response = await client.call_tool(
                 "get_patient_history",
-                {"data": {"user_id": user_id, "last_history_date": last_history_date, "doctor_type": ""}},
+                {"data": {"user_id": user_id, "last_history_date": last_history_date.isoformat(), "doctor_type": ""}},
             )
         raw_results = response.structured_content or {}
         history_collection = raw_results.get("result", [])
@@ -75,6 +84,11 @@ async def create_history_from_prompt(data: HistoryFromPromptRequestSchema) -> Ag
 
 
 async def update_patient_history(history_id: str, data: UpdatePatientHistorySchema) -> AgentResult:
+    history_date = data.history_date
+    if history_date.tzinfo is None:
+        history_date = history_date.replace(tzinfo=timezone.utc)
+    else:
+        history_date = history_date.astimezone(timezone.utc)
     try:
         async with Client(settings.client_history_agent_url) as client:
             response = await client.call_tool(
@@ -82,7 +96,7 @@ async def update_patient_history(history_id: str, data: UpdatePatientHistorySche
                 {
                     "data": {
                         "history_id": history_id,
-                        "history_date": data.history_date,
+                        "history_date": history_date.isoformat(),
                         "subjective": data.subjective,
                         "objective": data.objective,
                         "assessment": data.assessment,

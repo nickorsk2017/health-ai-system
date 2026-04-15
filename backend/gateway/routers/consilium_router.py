@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, HTTPException, Query
 
 from schemas.consilium_schema import SpecialistFindingSchema
@@ -9,7 +11,7 @@ router = APIRouter(prefix="/api/v1/consilium", tags=["consilium"])
 @router.get("/{user_id}", response_model=list[SpecialistFindingSchema])
 async def get_consilium(
     user_id: str,
-    start_date: str = Query(description="ISO 8601 date (YYYY-MM-DD). Analyse visits from this date onward."),
+    start_date: datetime = Query(description="ISO 8601 UTC datetime. Analyse visits from this timestamp onward."),
 ) -> list[SpecialistFindingSchema]:
     agent_result = await fetch_consilium(user_id, start_date)
     if not agent_result["success"]:

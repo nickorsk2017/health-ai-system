@@ -1,18 +1,25 @@
+import dayjs from "dayjs";
+
 const BASE = `${process.env.NEXT_PUBLIC_API_URL}/patient-history`;
 
 export class PatientHistoryService {
   static async recordHistory(data: Entity.CreatePatientHistory): Promise<Entity.RecordPatientHistoryResponse> {
+    const payload = {
+      ...data,
+      history_date: dayjs(data.history_date).toISOString(),
+    };
     const res = await fetch(BASE, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error(`PatientHistoryService.recordHistory failed: ${res.status}`);
     return res.json();
   }
 
   static async fetchHistory(userId: string, lastHistoryDate: string): Promise<Entity.PatientHistoryRecord[]> {
-    const url = `${BASE}/${userId}?last_history_date=${lastHistoryDate}`;
+    const normalizedDate = encodeURIComponent(dayjs(lastHistoryDate).toISOString());
+    const url = `${BASE}/${userId}?last_history_date=${normalizedDate}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`PatientHistoryService.fetchHistory failed: ${res.status}`);
     return res.json();
@@ -29,10 +36,14 @@ export class PatientHistoryService {
   }
 
   static async updateHistory(historyId: string, data: Entity.UpdatePatientHistory): Promise<Entity.MutatePatientHistoryResponse> {
+    const payload = {
+      ...data,
+      history_date: dayjs(data.history_date).toISOString(),
+    };
     const res = await fetch(`${BASE}/${historyId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error(`PatientHistoryService.updateHistory failed: ${res.status}`);
     return res.json();

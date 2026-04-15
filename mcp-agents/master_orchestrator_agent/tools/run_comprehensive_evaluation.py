@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from loguru import logger
 
 from chains.consilium_chain import build_consilium_chain
@@ -12,9 +14,14 @@ async def run_comprehensive_evaluation(request: EvaluationRequest) -> Evaluation
         f"Starting comprehensive evaluation: user={request.user_id}, from={request.start_date}"
     )
 
+    start_date = request.start_date
+    if start_date.tzinfo is None:
+        start_date = start_date.replace(tzinfo=timezone.utc)
+    else:
+        start_date = start_date.astimezone(timezone.utc)
     initial_state: ConsiliumState = {
         "user_id": request.user_id,
-        "start_date": str(request.start_date),
+        "start_date": start_date.isoformat(),
         "history_records": [],
         "lab_records": [],
         "history_error": None,

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -7,7 +9,7 @@ class AppointmentRecord(BaseModel):
     appointment_id: str
     complaint_id: str
     user_id: str
-    appointment_date: str
+    appointment_date: datetime
     doctor_type: str
     problem_notes: str
-    created_at: str
+    created_at: datetime

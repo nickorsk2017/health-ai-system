@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from _common.models.appointment import AppointmentRecord
 
 from pydantic import BaseModel
@@ -6,7 +8,7 @@ from pydantic import BaseModel
 class CreateAppointmentRequest(BaseModel):
     complaint_id: str
     user_id: str
-    appointment_date: str  # ISO format: YYYY-MM-DDTHH:MM:SS
+    appointment_date: datetime
     doctor_type: str
     problem_notes: str = ""
 

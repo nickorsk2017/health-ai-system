@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime, timezone
 from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -19,18 +19,23 @@ class DoctorType(str, Enum):
     general_practitioner = "general_practitioner"
 
 
-def _validate_not_future(history_date: date) -> date:
-    if history_date > date.today():
-        raise ValueError("date must be today or in the past")
-    return history_date
+def _validate_not_future(history_datetime: datetime) -> datetime:
+    normalized = history_datetime
+    if history_datetime.tzinfo is None:
+        normalized = history_datetime.replace(tzinfo=timezone.utc)
+    else:
+        normalized = history_datetime.astimezone(timezone.utc)
+    if normalized > datetime.now(timezone.utc):
+        raise ValueError("datetime must be now or in the past")
+    return normalized
 
 
 HistoryDate = Annotated[
-    date,
+    datetime,
     AfterValidator(_validate_not_future),
     Field(
-        description="YYYY-MM-DD, Date of the medical visit in ISO 8601 format. Must be today or in the past.",
-        format="date",
+        description="ISO 8601 UTC datetime of the medical visit. Must be now or in the past.",
+        format="date-time",
     ),
 ]
 
@@ -46,4 +51,7 @@ class PatientHistoryRecord(BaseModel):
     objective: str = Field(description="Clinical findings, vitals, and examination results.")
     assessment: str = Field(description="Clinical impression or diagnosis.")
     plan: str = Field(default="", description="Treatment plan or next steps.")
-    created_at: str = Field(default="", description="ISO 8601 timestamp when the record was created.")
+    created_at: datetime | None = Field(
+        default=None,
+        description="ISO 8601 UTC timestamp",
+    )

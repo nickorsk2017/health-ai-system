@@ -100,7 +100,7 @@ export default function ComplaintList({ userId, isDoctor = false }: Props) {
               <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                 <p className="truncate text-sm font-medium text-slate-800">{c.problem_health}</p>
                 <div className="flex items-center gap-3 text-xs text-slate-500">
-                  <span>Reported {formatDate(c.date_public)}</span>
+                  <span>Reported {formatDate(c.date_public, "MMM D, YYYY, HH:mm")}</span>
                   <span
                     className={`rounded-full px-2 py-0.5 font-medium ${STATUS_CLASSES[c.status]}`}
                   >

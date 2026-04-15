@@ -1,5 +1,5 @@
 import uuid
-from datetime import date
+from datetime import timezone
 
 from loguru import logger
 from sqlalchemy import insert, select, update
@@ -21,7 +21,11 @@ def to_record(row: Complaint) -> ComplaintRecord:
 
 
 async def upsert_complaint(request: UpsertComplaintRequest) -> UpsertComplaintResponse:
-    date_public = date.fromisoformat(request.date_public)
+    date_public = request.date_public
+    if date_public.tzinfo is None:
+        date_public = date_public.replace(tzinfo=timezone.utc)
+    else:
+        date_public = date_public.astimezone(timezone.utc)
 
     if request.complaint_id:
         complaint_id = uuid.UUID(request.complaint_id)

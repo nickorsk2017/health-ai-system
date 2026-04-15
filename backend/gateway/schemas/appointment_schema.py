@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 from _common.models.appointment import AppointmentRecord
@@ -9,7 +11,7 @@ AppointmentRecordSchema = AppointmentRecord
 class CreateAppointmentSchema(BaseModel):
     complaint_id: str
     user_id: str
-    appointment_date: str
+    appointment_date: datetime
     doctor_type: str
     problem_notes: str = ""
 

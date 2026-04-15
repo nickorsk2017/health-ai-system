@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import timezone
 
 from loguru import logger
 from sqlalchemy import insert, text
@@ -23,12 +23,11 @@ async def create_appointment(request: CreateAppointmentRequest) -> CreateAppoint
             success=False, error=f"Invalid user_id: {request.user_id}"
         )
 
-    try:
-        appointment_date = datetime.fromisoformat(request.appointment_date)
-    except ValueError:
-        return CreateAppointmentResponse(
-            success=False, error=f"Invalid appointment_date: {request.appointment_date}"
-        )
+    appointment_date = request.appointment_date
+    if appointment_date.tzinfo is None:
+        appointment_date = appointment_date.replace(tzinfo=timezone.utc)
+    else:
+        appointment_date = appointment_date.astimezone(timezone.utc)
 
     appointment_id = uuid.uuid4()
 

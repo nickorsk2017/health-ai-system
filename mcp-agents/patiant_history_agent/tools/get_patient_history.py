@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from loguru import logger
 from sqlalchemy import select
 
@@ -10,14 +12,19 @@ from schemas.http import GetPatientHistoryRequest
 async def get_patient_history(
     data: GetPatientHistoryRequest,
 ) -> list[PatientHistoryRecord]:
+    last_history_date = data.last_history_date
+    if last_history_date.tzinfo is None:
+        last_history_date = last_history_date.replace(tzinfo=timezone.utc)
+    else:
+        last_history_date = last_history_date.astimezone(timezone.utc)
     logger.info(
-        f"Fetching patient history: user={data.user_id}, from={data.last_history_date}, specialty={data.doctor_type if data.doctor_type else 'all'}"
+        f"Fetching patient history: user={data.user_id}, from={last_history_date}, specialty={data.doctor_type if data.doctor_type else 'all'}"
     )
 
     query = (
         select(PatientHistory)
         .where(PatientHistory.user_id == data.user_id)
-        .where(PatientHistory.history_date >= data.last_history_date)
+        .where(PatientHistory.history_date >= last_history_date)
         .order_by(PatientHistory.history_date.desc())
     )
 

@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 
@@ -14,16 +14,16 @@ class AddPatientAnalysisResponse(BaseModel):
 
 class GetPatientAnalysesRequest(BaseModel):
     user_id: str = Field(description="Identifier of the patient.")
-    start_date: date = Field(
-        description="ISO 8601 start date for the search (YYYY-MM-DD).",
-        format="date",
+    start_date: datetime = Field(
+        description="ISO 8601 UTC start datetime for the search.",
+        format="date-time",
     )
 
 
 class UpdateAnalysisRequest(BaseModel):
     analysis_id: str = Field(description="UUID of the analysis record to update.")
     analysis_text: str | None = Field(default=None, description="Updated lab result text.")
-    analysis_date: str | None = Field(default=None, description="Updated ISO 8601 date YYYY-MM-DD.")
+    analysis_date: datetime | None = Field(default=None, description="Updated ISO 8601 UTC datetime.")
 
 
 class UpdateAnalysisResponse(BaseModel):

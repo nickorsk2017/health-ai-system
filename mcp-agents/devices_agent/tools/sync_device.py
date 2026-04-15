@@ -64,16 +64,16 @@ async def sync_device(device: Device) -> bool:
             logger.warning(f"Unknown device type '{device.type_device}' for device {device.id}")
             return False
 
+        now = datetime.now(timezone.utc)
         log_payload = {
             "device_id": str(device.id),
             "type_device": device.type_device,
             "user_id": device.user_id,
             "diagnosis_mock": device.diagnosis_mock,
-            "sync_date": date.today().isoformat(),
+            "sync_timestamp": now.isoformat(),
             "records": records,
         }
         log_str = json.dumps(log_payload, default=str, indent=2)
-        now = datetime.now(timezone.utc)
 
         async with SessionLocal() as session:
             await session.execute(

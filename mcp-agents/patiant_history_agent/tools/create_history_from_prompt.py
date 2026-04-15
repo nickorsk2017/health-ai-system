@@ -1,6 +1,6 @@
 import sys
 import uuid
-from datetime import date
+from datetime import datetime, timezone
 from pathlib import Path
 
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -22,7 +22,7 @@ logger.add(sys.stderr, level="INFO")
 
 
 class _ParsedRecord(BaseModel):
-    history_date: str = Field(description="ISO 8601 date YYYY-MM-DD.")
+    history_date: str = Field(description="ISO 8601 UTC datetime.")
     doctor_type: str = Field(description="Medical specialty value from the allowed list.")
     subjective: str = Field(description="Patient complaints and reported symptoms.")
     objective: str = Field(description="Clinical findings, vitals, examination results.")
@@ -42,13 +42,20 @@ def _coerce_doctor_type(raw: str) -> DoctorType:
         return _FALLBACK_DOCTOR_TYPE
 
 
-def _coerce_date(raw: str) -> date:
+def _coerce_date(raw: str) -> datetime:
     try:
-        parsed = date.fromisoformat(raw)
-        return min(parsed, date.today())
+        parsed = datetime.fromisoformat(raw)
     except (ValueError, TypeError):
-        logger.warning(f"Could not parse date '{raw}', using today")
-        return date.today()
+        try:
+            parsed = datetime.fromisoformat(f"{raw}T00:00:00")
+        except (ValueError, TypeError):
+            logger.warning(f"Could not parse date '{raw}', using today")
+            return datetime.now(timezone.utc)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    else:
+        parsed = parsed.astimezone(timezone.utc)
+    return min(parsed, datetime.now(timezone.utc))
 
 
 def _fill_missing(value: str) -> str:
@@ -61,7 +68,7 @@ async def create_history_from_prompt(
     data: CreateHistoryFromPromptRequest,
 ) -> CreateHistoryFromPromptResponse:
     system_prompt = _PROMPT_PATH.read_text(encoding="utf-8").replace(
-        "{{TODAY}}", date.today().isoformat()
+        "{{TODAY}}", datetime.now(timezone.utc).isoformat()
     )
 
     logger.info(f"Parsing prompt for user={data.user_id}, chars={len(data.prompt)}")

@@ -1,7 +1,7 @@
 import uuid
-from datetime import date, datetime
+from datetime import datetime
 
-from sqlalchemy import Date, DateTime, String, Text, func
+from sqlalchemy import DateTime, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -16,7 +16,7 @@ class PatientHistory(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     doctor_type: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
-    history_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
+    history_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, index=True)
     subjective: Mapped[str] = mapped_column(Text, nullable=False)
     objective: Mapped[str] = mapped_column(Text, nullable=False)
     assessment: Mapped[str] = mapped_column(Text, nullable=False)

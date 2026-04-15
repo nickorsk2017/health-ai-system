@@ -49,7 +49,7 @@ export default function ComplaintDetailModal({ isOpen, complaint, doctorUserId, 
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <span className="text-xs text-slate-500">
-              Reported {formatDate(complaint.date_public)}
+              Reported {formatDate(complaint.date_public, "MMM D, YYYY, HH:mm")}
             </span>
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_CLASSES[complaint.status]}`}

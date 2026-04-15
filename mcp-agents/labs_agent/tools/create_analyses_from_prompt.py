@@ -1,5 +1,5 @@
 import uuid
-from datetime import date
+from datetime import datetime, timezone
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
@@ -16,7 +16,7 @@ _SYSTEM_PROMPT = (
     "Today is {today}. Parse the following text into individual laboratory analysis entries.\n"
     "For each distinct lab test event extract:\n"
     "  - analysis_text: the full lab result content (biomarkers, values, units, reference ranges).\n"
-    "  - analysis_date: ISO 8601 date YYYY-MM-DD when the test was performed.\n"
+    "  - analysis_date: ISO 8601 UTC datetime when the test was performed.\n"
     "Rules:\n"
     "  - If the date cannot be determined, set analysis_date to an empty string.\n"
     "  - If meaningful lab text cannot be extracted, set analysis_text to an empty string.\n"
@@ -32,7 +32,7 @@ class _ParsedAnalysis(BaseModel):
     )
     analysis_date: str = Field(
         default="",
-        description="ISO 8601 date YYYY-MM-DD when the test was performed. Empty string if unknown.",
+        description="ISO 8601 UTC datetime when the test was performed. Empty string if unknown.",
     )
 
 
@@ -42,13 +42,23 @@ class _ParsedAnalysisList(BaseModel):
     )
 
 
-def _parse_date(raw: str) -> date | None:
+def _parse_date(raw: str) -> datetime | None:
     raw = raw.strip()
     if not raw:
         return None
     try:
-        parsed = date.fromisoformat(raw)
-        return min(parsed, date.today())
+        parsed = datetime.fromisoformat(raw)
+    except ValueError:
+        try:
+            parsed = datetime.fromisoformat(f"{raw}T00:00:00")
+        except ValueError:
+            return None
+    try:
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        else:
+            parsed = parsed.astimezone(timezone.utc)
+        return min(parsed, datetime.now(timezone.utc))
     except ValueError:
         return None
 
@@ -66,7 +76,7 @@ async def create_analyses_from_prompt(
     structured_llm = llm.with_structured_output(_ParsedAnalysisList)
     parsed: _ParsedAnalysisList = await structured_llm.ainvoke(
         [
-            SystemMessage(content=_SYSTEM_PROMPT.format(today=date.today().isoformat())),
+            SystemMessage(content=_SYSTEM_PROMPT.format(today=datetime.now(timezone.utc).isoformat())),
             HumanMessage(content=data.prompt),
         ]
     )

@@ -1,5 +1,5 @@
 import asyncio
-from datetime import date
+from datetime import datetime, timedelta, timezone
 
 from loguru import logger
 from sqlalchemy import select
@@ -7,16 +7,18 @@ from sqlalchemy import select
 from config import settings
 from db.engine import SessionLocal
 from db.models import Device, DeviceLog
-from sqlalchemy.sql import func
 from tools.sync_device import sync_device
 
 
 async def _devices_needing_sync() -> list[Device]:
-    today = date.today()
+    now = datetime.now(timezone.utc)
+    day_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    day_end = day_start + timedelta(days=1)
     async with SessionLocal() as session:
         synced_today = (
             select(DeviceLog.device_id)
-            .where(func.date(DeviceLog.date_log) == today)
+            .where(DeviceLog.date_log >= day_start)
+            .where(DeviceLog.date_log < day_end)
             .scalar_subquery()
         )
         result = await session.execute(

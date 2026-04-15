@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import dayjs from "dayjs";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import cx from "@/utils/cx";
@@ -35,14 +36,30 @@ export default function CalendarView({ appointments, onDayClick }: Props) {
     else setMonth((m) => m + 1);
   };
 
-  const appointmentsByDate = appointments.reduce<Record<string, Entity.Appointment[]>>(
-    (acc, appt) => {
-      const key = appt.appointment_date.slice(0, 10);
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(appt);
-      return acc;
-    },
-    {},
+  const appointmentsByDate = useMemo(
+    () =>
+      appointments.reduce<Record<string, Entity.Appointment[]>>((acc, appt) => {
+        const key = dayjs(appt.appointment_date).local().format("YYYY-MM-DD");
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(appt);
+        return acc;
+      }, {}),
+    [appointments],
+  );
+
+  const appointmentPreviewByDate = useMemo(
+    () =>
+      Object.entries(appointmentsByDate).reduce<
+        Record<string, Array<{ appointment_id: string; doctor_type: string; local_time: string }>>
+      >((acc, [dateKey, list]) => {
+        acc[dateKey] = list.slice(0, 2).map((appt) => ({
+          appointment_id: appt.appointment_id,
+          doctor_type: appt.doctor_type,
+          local_time: dayjs(appt.appointment_date).local().format("HH:mm"),
+        }));
+        return acc;
+      }, {}),
+    [appointmentsByDate],
   );
 
   const cells: (number | null)[] = [
@@ -51,6 +68,8 @@ export default function CalendarView({ appointments, onDayClick }: Props) {
   ];
 
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+  
 
   return (
     <div className="flex flex-col gap-4">
@@ -92,6 +111,7 @@ export default function CalendarView({ appointments, onDayClick }: Props) {
           }
           const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
           const dayAppts = appointmentsByDate[dateKey] ?? [];
+          const dayPreview = appointmentPreviewByDate[dateKey] ?? [];
           const isToday = dateKey === todayKey;
 
           return (
@@ -112,15 +132,17 @@ export default function CalendarView({ appointments, onDayClick }: Props) {
                 {day}
               </span>
               <div className="flex flex-col gap-0.5 overflow-hidden">
-                {dayAppts.slice(0, 2).map((appt) => (
-                  <span
-                    key={appt.appointment_id}
-                    className="truncate rounded bg-blue-100 px-1 py-0.5 text-xs font-medium text-blue-700"
-                    title={`${appt.doctor_type} — ${appt.appointment_date.slice(11, 16)}`}
-                  >
-                    {appt.appointment_date.slice(11, 16)} {appt.doctor_type}
-                  </span>
-                ))}
+                {dayPreview.map((appt) => {
+                  return (
+                    <span
+                      key={appt.appointment_id}
+                      className="truncate rounded bg-blue-100 px-1 py-0.5 text-xs font-medium text-blue-700"
+                      title={`${appt.doctor_type} — ${appt.local_time}`}
+                    >
+                      {appt.local_time} {appt.doctor_type}
+                    </span>
+                  );
+                })}
                 {dayAppts.length > 2 && (
                   <span className="text-xs text-slate-400">+{dayAppts.length - 2} more</span>
                 )}

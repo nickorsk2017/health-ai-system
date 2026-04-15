@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from loguru import logger
 from sqlalchemy import or_, select
 
@@ -7,14 +9,19 @@ from schemas.http import GetPatientAnalysesRequest, GetPatientAnalysisRecord
 
 
 async def get_patient_analyses(data: GetPatientAnalysesRequest) -> list[GetPatientAnalysisRecord]:
-    logger.info(f"Fetching analyses: user={data.user_id}, from={data.start_date}")
+    start_date = data.start_date
+    if start_date.tzinfo is None:
+        start_date = start_date.replace(tzinfo=timezone.utc)
+    else:
+        start_date = start_date.astimezone(timezone.utc)
+    logger.info(f"Fetching analyses: user={data.user_id}, from={start_date}")
 
     query = (
         select(PatientAnalysisRow)
         .where(PatientAnalysisRow.user_id == data.user_id)
         .where(
             or_(
-                PatientAnalysisRow.analysis_date >= data.start_date,
+                PatientAnalysisRow.analysis_date >= start_date,
                 PatientAnalysisRow.analysis_date.is_(None),
             )
         )

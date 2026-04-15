@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 
@@ -13,7 +13,7 @@ class AnalysisRequestSchema(BaseModel):
     analysis_text: str = Field(
         description="Raw or structured text of the lab results, e.g. 'Glucose: 105 mg/dL, HbA1c: 5.7%'."
     )
-    analysis_date: date = Field(description="ISO 8601 date of the lab result (YYYY-MM-DD).")
+    analysis_date: datetime = Field(description="ISO 8601 UTC datetime of the lab result.")
 
 
 class AnalysisResponseSchema(BaseModel):
@@ -22,7 +22,7 @@ class AnalysisResponseSchema(BaseModel):
 
 class UpdateAnalysisSchema(BaseModel):
     analysis_text: str | None = None
-    analysis_date: str | None = None
+    analysis_date: datetime | None = None
 
 
 class MutateAnalysisResponseSchema(BaseModel):

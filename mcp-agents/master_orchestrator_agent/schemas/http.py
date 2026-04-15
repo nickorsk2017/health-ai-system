@@ -5,8 +5,8 @@ from pydantic import BaseModel, Field
 
 class EvaluationRequest(BaseModel):
     user_id: str = Field(description="Identifier of the patient.")
-    start_date: datetime.date = Field(
-        description="ISO 8601 start date for data retrieval (YYYY-MM-DD)."
+    start_date: datetime.datetime = Field(
+        description="ISO 8601 UTC start datetime for data retrieval."
     )
 
 
@@ -24,8 +24,8 @@ class EvaluationResponse(BaseModel):
 
 class GPDiagnosisRequest(BaseModel):
     user_id: str = Field(description="Identifier of the patient.")
-    start_date: datetime.date = Field(
-        description="ISO 8601 start date for data retrieval (YYYY-MM-DD)."
+    start_date: datetime.datetime = Field(
+        description="ISO 8601 UTC start datetime for data retrieval."
     )
 
 

@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 const BASE = `${process.env.NEXT_PUBLIC_API_URL}/complaints`;
 
 export class ComplaintService {
@@ -8,10 +10,15 @@ export class ComplaintService {
   }
 
   static async create(userId: string, form: Entity.CreateComplaint): Promise<Entity.Complaint> {
+    const payload = {
+      user_id: userId,
+      ...form,
+      date_public: dayjs(form.date_public).toISOString(),
+    };
     const res = await fetch(BASE, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: userId, ...form }),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error(`ComplaintService.create failed: ${res.status}`);
     return res.json();
@@ -22,10 +29,15 @@ export class ComplaintService {
     userId: string,
     form: Entity.UpdateComplaint,
   ): Promise<Entity.Complaint> {
+    const payload = {
+      user_id: userId,
+      ...form,
+      date_public: dayjs(form.date_public).toISOString(),
+    };
     const res = await fetch(`${BASE}/${complaintId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: userId, ...form }),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error(`ComplaintService.update failed: ${res.status}`);
     return res.json();

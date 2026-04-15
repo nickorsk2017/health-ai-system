@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from _common.models.complaint import ComplaintRecord, ComplaintStatus
 
 from pydantic import BaseModel, Field
@@ -6,7 +8,7 @@ from pydantic import BaseModel, Field
 class UpsertComplaintRequest(BaseModel):
     user_id: str = Field(description="UUID of the patient submitting the complaint.")
     problem_health: str = Field(description="Description of the symptom or health problem.")
-    date_public: str = Field(description="ISO 8601 date when the patient started feeling this (YYYY-MM-DD).")
+    date_public: datetime = Field(description="ISO 8601 UTC datetime when the patient reported this complaint.")
     complaint_id: str | None = Field(
         default=None,
         description="UUID of an existing complaint to update. Omit to create a new one.",

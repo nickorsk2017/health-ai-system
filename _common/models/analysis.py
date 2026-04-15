@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -7,5 +9,5 @@ class AnalysisRecord(BaseModel):
     analysis_id: str
     user_id: str
     analysis_text: str | None = None
-    analysis_date: str | None = None
-    created_at: str = ""
+    analysis_date: datetime | None = None
+    created_at: datetime

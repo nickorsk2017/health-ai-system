@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from fastmcp import Client
 
 from config import settings
@@ -6,11 +8,16 @@ from services.agent_result import AgentResult, to_response
 
 
 async def upsert_complaint(complaint_id: str | None, data: UpsertComplaintSchema) -> AgentResult:
+    date_public = data.date_public
+    if date_public.tzinfo is None:
+        date_public = date_public.replace(tzinfo=timezone.utc)
+    else:
+        date_public = date_public.astimezone(timezone.utc)
     try:
         payload: dict = {
             "user_id": data.user_id,
             "problem_health": data.problem_health,
-            "date_public": data.date_public,
+            "date_public": date_public.isoformat(),
         }
         if complaint_id:
             payload["complaint_id"] = complaint_id

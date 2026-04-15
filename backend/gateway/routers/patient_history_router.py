@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, HTTPException, Query
 
 from schemas.patient_history_schema import (
@@ -39,8 +41,8 @@ async def import_history_from_prompt(body: HistoryFromPromptRequestSchema) -> Hi
 @router.get("/{user_id}", response_model=list[PatientHistoryRecordSchema])
 async def get_patient_history(
     user_id: str,
-    last_history_date: str = Query(
-        description="ISO 8601 date (YYYY-MM-DD). Returns records from this date onward."
+    last_history_date: datetime = Query(
+        description="ISO 8601 UTC datetime. Returns records from this timestamp onward."
     ),
 ) -> list[PatientHistoryRecordSchema]:
     agent_result = await fetch_patient_history(user_id, last_history_date)

@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastmcp import Client
 
 from config import settings
@@ -14,6 +16,11 @@ from services.agent_result import AgentResult, to_response
 
 
 async def record_analysis(data: AnalysisRequestSchema) -> AgentResult:
+    analysis_date = data.analysis_date
+    if analysis_date.tzinfo is None:
+        analysis_date = analysis_date.replace(tzinfo=timezone.utc)
+    else:
+        analysis_date = analysis_date.astimezone(timezone.utc)
     try:
         async with Client(settings.labs_agent_url) as client:
             response = await client.call_tool(
@@ -22,7 +29,7 @@ async def record_analysis(data: AnalysisRequestSchema) -> AgentResult:
                     "data": {
                         "user_id": data.user_id,
                         "analysis_text": data.analysis_text,
-                        "analysis_date": data.analysis_date.isoformat(),
+                        "analysis_date": analysis_date.isoformat(),
                     }
                 },
             )
@@ -33,12 +40,16 @@ async def record_analysis(data: AnalysisRequestSchema) -> AgentResult:
         return to_response(error=str(exc))
 
 
-async def fetch_analyses(user_id: str, start_date: str) -> AgentResult:
+async def fetch_analyses(user_id: str, start_date: datetime) -> AgentResult:
+    if start_date.tzinfo is None:
+        start_date = start_date.replace(tzinfo=timezone.utc)
+    else:
+        start_date = start_date.astimezone(timezone.utc)
     try:
         async with Client(settings.labs_agent_url) as client:
             response = await client.call_tool(
                 "get_patient_analyses",
-                {"data": {"user_id": user_id, "start_date": start_date}},
+                {"data": {"user_id": user_id, "start_date": start_date.isoformat()}},
             )
         raw_results = response.structured_content or {}
         analyses_collection = raw_results.get("result", [])
@@ -48,6 +59,12 @@ async def fetch_analyses(user_id: str, start_date: str) -> AgentResult:
 
 
 async def update_analysis(analysis_id: str, data: UpdateAnalysisSchema) -> AgentResult:
+    analysis_date = data.analysis_date
+    if analysis_date is not None:
+        if analysis_date.tzinfo is None:
+            analysis_date = analysis_date.replace(tzinfo=timezone.utc)
+        else:
+            analysis_date = analysis_date.astimezone(timezone.utc)
     try:
         async with Client(settings.labs_agent_url) as client:
             response = await client.call_tool(
@@ -56,7 +73,7 @@ async def update_analysis(analysis_id: str, data: UpdateAnalysisSchema) -> Agent
                     "data": {
                         "analysis_id": analysis_id,
                         "analysis_text": data.analysis_text,
-                        "analysis_date": data.analysis_date,
+                        "analysis_date": analysis_date.isoformat() if analysis_date else None,
                     }
                 },
             )

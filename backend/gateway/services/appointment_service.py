@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from fastmcp import Client
 
 from config import settings
@@ -6,6 +8,11 @@ from services.agent_result import AgentResult, to_response
 
 
 async def create_appointment(data: CreateAppointmentSchema) -> AgentResult:
+    appointment_date = data.appointment_date
+    if appointment_date.tzinfo is None:
+        appointment_date = appointment_date.replace(tzinfo=timezone.utc)
+    else:
+        appointment_date = appointment_date.astimezone(timezone.utc)
     try:
         async with Client(settings.appointment_scheduler_agent_url) as client:
             response = await client.call_tool(
@@ -14,7 +21,7 @@ async def create_appointment(data: CreateAppointmentSchema) -> AgentResult:
                     "data": {
                         "complaint_id": data.complaint_id,
                         "user_id": data.user_id,
-                        "appointment_date": data.appointment_date,
+                        "appointment_date": appointment_date.isoformat(),
                         "doctor_type": data.doctor_type,
                         "problem_notes": data.problem_notes,
                     }

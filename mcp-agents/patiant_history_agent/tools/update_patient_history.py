@@ -1,5 +1,6 @@
 import sys
 import uuid
+from datetime import timezone
 
 from loguru import logger
 from sqlalchemy import select, update
@@ -19,6 +20,12 @@ async def update_patient_history(data: UpdatePatientHistoryRequest) -> UpdatePat
         logger.error(msg)
         return UpdatePatientHistoryResponse(success=False, error=msg)
 
+    history_date = data.history_date
+    if history_date.tzinfo is None:
+        history_date = history_date.replace(tzinfo=timezone.utc)
+    else:
+        history_date = history_date.astimezone(timezone.utc)
+
     async with SessionLocal() as session:
         result = await session.execute(select(PatientHistory).where(PatientHistory.id == history_id))
         if result.scalar_one_or_none() is None:
@@ -30,7 +37,7 @@ async def update_patient_history(data: UpdatePatientHistoryRequest) -> UpdatePat
             update(PatientHistory)
             .where(PatientHistory.id == history_id)
             .values(
-                history_date=data.history_date,
+                history_date=history_date,
                 subjective=data.subjective,
                 objective=data.objective,
                 assessment=data.assessment,

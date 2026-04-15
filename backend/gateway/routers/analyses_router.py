@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, HTTPException, Query
 
 from schemas.analysis_schema import (
@@ -55,9 +57,9 @@ async def remove_analysis(analysis_id: str) -> MutateAnalysisResponseSchema:
 @router.get("/{user_id}", response_model=list[AnalysisRecordSchema])
 async def get_analyses(
     user_id: str,
-    start_date: str = Query(
-        default="2000-01-01",
-        description="ISO 8601 start date (YYYY-MM-DD). Returns all analyses from this date onward.",
+    start_date: datetime = Query(
+        default=datetime(2000, 1, 1, tzinfo=timezone.utc),
+        description="ISO 8601 UTC start datetime. Returns all analyses from this point onward.",
     ),
 ) -> list[AnalysisRecordSchema]:
     agent_result = await fetch_analyses(user_id, start_date)

@@ -60,7 +60,7 @@ export default function AppointmentsPage({ userId }: Props) {
       {dayAppts && (
         <Modal
           isOpen
-          title={`Appointments — ${formatDate(dayAppts.date)}`}
+          title={`Appointments — ${formatDate(dayAppts.date, "MMM D, YYYY")}`}
           onClose={() => setDayAppts(null)}
         >
           <div className="flex flex-col gap-3">
@@ -72,7 +72,7 @@ export default function AppointmentsPage({ userId }: Props) {
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-semibold text-slate-800">{appt.doctor_type}</p>
                   <span className="text-xs text-slate-500">
-                    {appt.appointment_date.slice(11, 16)}
+                    {formatDate(appt.appointment_date, "HH:mm")}
                   </span>
                 </div>
                 {appt.problem_notes && (

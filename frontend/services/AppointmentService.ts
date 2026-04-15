@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 const BASE = `${process.env.NEXT_PUBLIC_API_URL}/appointments`;
 
 export class AppointmentService {
@@ -9,10 +11,14 @@ export class AppointmentService {
   }
 
   static async create(form: Entity.CreateAppointment): Promise<Entity.Appointment> {
+    const payload = {
+      ...form,
+      appointment_date: dayjs(form.appointment_date).toISOString(),
+    };
     const res = await fetch(BASE, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error(`AppointmentService.create failed: ${res.status}`);
     return res.json();

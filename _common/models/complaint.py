@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
@@ -11,6 +12,6 @@ class ComplaintRecord(BaseModel):
     complaint_id: str
     user_id: str
     problem_health: str
-    date_public: str
+    date_public: datetime
     status: ComplaintStatus
-    created_at: str
+    created_at: datetime

@@ -47,9 +47,9 @@ export default function AddComplaintModal({ isOpen, userId, onClose }: Props) {
           onChange={setProblemHealth}
         />
         <Input
-          label="Date Noticed"
+          label="Date & Time Noticed"
           id="date-public"
-          type="date"
+          type="datetime-local"
           value={datePublic}
           onChange={setDatePublic}
         />
