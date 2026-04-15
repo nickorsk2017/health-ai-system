@@ -41,14 +41,18 @@ services:
   # DEVICE SUB-AGENTS  (no database, no upstream dependencies)
   # ──────────────────────────────────────────────────────────────────────────────
   oura_ring_agent:
-    build: ./mcp-agents/oura_ring_agent
+    build:
+      context: .
+      dockerfile: mcp-agents/oura_ring_agent/Dockerfile
     <<: *common
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import socket; socket.create_connection(('localhost', 6330), 2).close()\""]
       <<: *hc
 
   apple_health_agent:
-    build: ./mcp-agents/apple_health_agent
+    build:
+      context: .
+      dockerfile: mcp-agents/apple_health_agent/Dockerfile
     <<: *common
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import socket; socket.create_connection(('localhost', 6331), 2).close()\""]
@@ -58,14 +62,18 @@ services:
   # SPECIALIST / REASONING AGENTS  (no database, no upstream dependencies)
   # ──────────────────────────────────────────────────────────────────────────────
   doctors_agent:
-    build: ./mcp-agents/doctors_agent
+    build:
+      context: .
+      dockerfile: mcp-agents/doctors_agent/Dockerfile
     <<: *common
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import socket; socket.create_connection(('localhost', 6333), 2).close()\""]
       <<: *hc
 
   gp_synthesis_agent:
-    build: ./mcp-agents/gp_synthesis_agent
+    build:
+      context: .
+      dockerfile: mcp-agents/gp_synthesis_agent/Dockerfile
     <<: *common
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import socket; socket.create_connection(('localhost', 6334), 2).close()\""]
@@ -75,7 +83,9 @@ services:
   # DATABASE-BACKED AGENTS
   # ──────────────────────────────────────────────────────────────────────────────
   client_history_agent:
-    build: ./mcp-agents/patiant_history_agent
+    build:
+      context: .
+      dockerfile: mcp-agents/patiant_history_agent/Dockerfile
     <<: *common
     depends_on:
       postgres:
@@ -85,7 +95,9 @@ services:
       <<: *hc
 
   labs_agent:
-    build: ./mcp-agents/labs_agent
+    build:
+      context: .
+      dockerfile: mcp-agents/labs_agent/Dockerfile
     <<: *common
     depends_on:
       postgres:
@@ -95,7 +107,9 @@ services:
       <<: *hc
 
   complaint_manager_agent:
-    build: ./mcp-agents/complaint_manager_agent
+    build:
+      context: .
+      dockerfile: mcp-agents/complaint_manager_agent/Dockerfile
     <<: *common
     depends_on:
       postgres:
@@ -105,7 +119,9 @@ services:
       <<: *hc
 
   appointment_scheduler_agent:
-    build: ./mcp-agents/appointment_scheduler_agent
+    build:
+      context: .
+      dockerfile: mcp-agents/appointment_scheduler_agent/Dockerfile
     <<: *common
     depends_on:
       postgres:
@@ -115,7 +131,9 @@ services:
       <<: *hc
 
   devices_agent:
-    build: ./mcp-agents/devices_agent
+    build:
+      context: .
+      dockerfile: mcp-agents/devices_agent/Dockerfile
     <<: *common
     depends_on:
       postgres:
@@ -132,7 +150,9 @@ services:
   # ORCHESTRATOR
   # ──────────────────────────────────────────────────────────────────────────────
   master_orchestrator_agent:
-    build: ./mcp-agents/master_orchestrator_agent
+    build:
+      context: .
+      dockerfile: mcp-agents/master_orchestrator_agent/Dockerfile
     <<: *common
     depends_on:
       client_history_agent:
@@ -155,7 +175,9 @@ services:
   # BACKEND
   # ──────────────────────────────────────────────────────────────────────────────
   user_microservice:
-    build: ./backend/user_microservice
+    build:
+      context: .
+      dockerfile: backend/user_microservice/Dockerfile
     <<: *common
     depends_on:
       postgres:
@@ -165,7 +187,9 @@ services:
       <<: *hc
 
   gateway:
-    build: ./backend/gateway
+    build:
+      context: .
+      dockerfile: backend/gateway/Dockerfile
     <<: *common
     ports:
       - "8000:8000"

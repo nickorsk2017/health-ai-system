@@ -2,11 +2,15 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY pyproject.toml .
-COPY . .
+RUN pip install --no-cache-dir uv
 
-RUN pip install --no-cache-dir uv && \
-    uv pip install --system --no-cache .
+COPY _common/ _common/
+COPY backend/gateway/ .
+
+RUN uv pip install --system --no-cache .
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
 
 EXPOSE 8000
 

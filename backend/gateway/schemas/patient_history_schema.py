@@ -1,24 +1,15 @@
-from enum import Enum
-
 from pydantic import BaseModel, Field
 
+from _common.models.visit import DoctorType, PatientHistoryRecord
 
-class DoctorTypeSchema(str, Enum):
-    oncology = "oncology"
-    gastroenterology = "gastroenterology"
-    cardiology = "cardiology"
-    hematology = "hematology"
-    nephrology = "nephrology"
-    nutrition = "nutrition"
-    endocrinology = "endocrinology"
-    mental_health = "mental_health"
-    pulmonology = "pulmonology"
-    general_practitioner = "general_practitioner"
+# Backward-compatible aliases
+DoctorTypeSchema = DoctorType
+PatientHistoryRecordSchema = PatientHistoryRecord
 
 
 class CreatePatientHistorySchema(BaseModel):
     user_id: str = Field(description="Patient identifier.")
-    doctor_type: DoctorTypeSchema
+    doctor_type: DoctorType
     history_date: str = Field(description="ISO 8601 date of the consultation (YYYY-MM-DD).")
     subjective: str = Field(description="Patient complaints, history, and symptoms.")
     objective: str = Field(description="Clinical findings, vitals, and examination results.")
@@ -29,18 +20,6 @@ class CreatePatientHistorySchema(BaseModel):
 class RecordPatientHistoryResponseSchema(BaseModel):
     success: bool
     history_id: str
-
-
-class PatientHistoryRecordSchema(BaseModel):
-    history_id: str
-    user_id: str
-    doctor_type: str
-    history_date: str
-    subjective: str
-    objective: str
-    assessment: str
-    plan: str = ""
-    created_at: str = ""
 
 
 class HistoryFromPromptRequestSchema(BaseModel):
@@ -63,3 +42,17 @@ class UpdatePatientHistorySchema(BaseModel):
 
 class MutatePatientHistoryResponseSchema(BaseModel):
     success: bool
+
+
+__all__ = [
+    "DoctorType",
+    "DoctorTypeSchema",
+    "PatientHistoryRecord",
+    "PatientHistoryRecordSchema",
+    "CreatePatientHistorySchema",
+    "RecordPatientHistoryResponseSchema",
+    "HistoryFromPromptRequestSchema",
+    "HistoryFromPromptResponseSchema",
+    "UpdatePatientHistorySchema",
+    "MutatePatientHistoryResponseSchema",
+]

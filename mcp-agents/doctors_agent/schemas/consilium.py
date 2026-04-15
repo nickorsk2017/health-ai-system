@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from _common.schemas.specialist_finding import SpecialistFinding
+
 
 class SpecialistAnalysis(BaseModel):
     """Structured LLM output for a single specialty review."""
@@ -29,9 +31,4 @@ class SpecialistAnalysis(BaseModel):
     )
 
 
-class SpecialistFinding(BaseModel):
-    specialty: str = Field(description="Medical specialty that produced this finding.")
-    risks: str
-    treatment: str
-    prognosis: str
-    probable_diagnosis: str
+__all__ = ["SpecialistAnalysis", "SpecialistFinding"]

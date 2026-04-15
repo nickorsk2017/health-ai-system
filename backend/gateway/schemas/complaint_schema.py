@@ -1,8 +1,9 @@
-from typing import Literal
-
 from pydantic import BaseModel
 
-ComplaintStatus = Literal["unread", "read", "appointment"]
+from _common.models.complaint import ComplaintRecord, ComplaintStatus
+
+# Backward-compatible aliases
+ComplaintRecordSchema = ComplaintRecord
 
 
 class UpsertComplaintSchema(BaseModel):
@@ -11,10 +12,9 @@ class UpsertComplaintSchema(BaseModel):
     date_public: str
 
 
-class ComplaintRecordSchema(BaseModel):
-    complaint_id: str
-    user_id: str
-    problem_health: str
-    date_public: str
-    status: ComplaintStatus
-    created_at: str
+__all__ = [
+    "ComplaintStatus",
+    "ComplaintRecord",
+    "ComplaintRecordSchema",
+    "UpsertComplaintSchema",
+]

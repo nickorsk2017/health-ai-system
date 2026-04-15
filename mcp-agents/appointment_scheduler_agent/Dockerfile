@@ -4,10 +4,12 @@ WORKDIR /app
 
 RUN pip install --no-cache-dir uv
 
-COPY . .
+COPY _common/ _common/
+COPY mcp-agents/appointment_scheduler_agent/ .
 
 RUN uv pip install --system --no-cache .
 
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
 
 CMD ["appointment-scheduler-agent"]

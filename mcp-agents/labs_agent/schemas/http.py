@@ -2,6 +2,11 @@ from datetime import date
 
 from pydantic import BaseModel, Field
 
+from _common.models.analysis import AnalysisRecord
+
+# Backward-compatible alias used by existing tool files
+GetPatientAnalysisRecord = AnalysisRecord
+
 
 class AddPatientAnalysisResponse(BaseModel):
     success: bool
@@ -13,14 +18,6 @@ class GetPatientAnalysesRequest(BaseModel):
         description="ISO 8601 start date for the search (YYYY-MM-DD).",
         format="date",
     )
-
-
-class GetPatientAnalysisRecord(BaseModel):
-    analysis_id: str
-    user_id: str
-    analysis_text: str | None = None
-    analysis_date: str | None = None
-    created_at: str = ""
 
 
 class UpdateAnalysisRequest(BaseModel):
@@ -54,3 +51,17 @@ class CreateAnalysesFromPromptResponse(BaseModel):
         default_factory=list,
         description="Raw text of entries that had missing analysis_text or analysis_date.",
     )
+
+
+__all__ = [
+    "AnalysisRecord",
+    "GetPatientAnalysisRecord",
+    "AddPatientAnalysisResponse",
+    "GetPatientAnalysesRequest",
+    "UpdateAnalysisRequest",
+    "UpdateAnalysisResponse",
+    "DeleteAnalysisRequest",
+    "DeleteAnalysisResponse",
+    "CreateAnalysesFromPromptRequest",
+    "CreateAnalysesFromPromptResponse",
+]

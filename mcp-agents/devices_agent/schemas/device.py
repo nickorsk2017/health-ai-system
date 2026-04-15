@@ -1,10 +1,9 @@
-import uuid
-from datetime import datetime
-from typing import Literal
+from _common.models.device import DeviceRecord, DeviceType
 
 from pydantic import BaseModel, Field
 
-DeviceType = Literal["apple_health", "oura_ring"]
+# Backward-compatible alias used by existing tool files
+DeviceWithLastSync = DeviceRecord
 
 
 class AddDeviceRequest(BaseModel):
@@ -30,10 +29,12 @@ class RemoveDeviceResponse(BaseModel):
     error: str = ""
 
 
-class DeviceWithLastSync(BaseModel):
-    id: str
-    user_id: str
-    type_device: str
-    diagnosis_mock: str | None
-    created_at: datetime
-    last_sync: datetime | None
+__all__ = [
+    "DeviceRecord",
+    "DeviceType",
+    "DeviceWithLastSync",
+    "AddDeviceRequest",
+    "AddDeviceResponse",
+    "RemoveDeviceRequest",
+    "RemoveDeviceResponse",
+]

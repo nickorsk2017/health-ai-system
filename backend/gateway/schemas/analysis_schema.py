@@ -2,6 +2,11 @@ from datetime import date
 
 from pydantic import BaseModel, Field
 
+from _common.models.analysis import AnalysisRecord
+
+# Backward-compatible alias
+AnalysisRecordSchema = AnalysisRecord
+
 
 class AnalysisRequestSchema(BaseModel):
     user_id: str = Field(description="Identifier of the patient.")
@@ -13,14 +18,6 @@ class AnalysisRequestSchema(BaseModel):
 
 class AnalysisResponseSchema(BaseModel):
     success: bool
-
-
-class AnalysisRecordSchema(BaseModel):
-    analysis_id: str
-    user_id: str
-    analysis_text: str | None = None
-    analysis_date: str | None = None
-    created_at: str
 
 
 class UpdateAnalysisSchema(BaseModel):
@@ -40,3 +37,15 @@ class AnalysisByPromptRequestSchema(BaseModel):
 class AnalysisByPromptResponseSchema(BaseModel):
     success: bool
     list_missing_analysis: list[str] = Field(default_factory=list)
+
+
+__all__ = [
+    "AnalysisRecord",
+    "AnalysisRecordSchema",
+    "AnalysisRequestSchema",
+    "AnalysisResponseSchema",
+    "UpdateAnalysisSchema",
+    "MutateAnalysisResponseSchema",
+    "AnalysisByPromptRequestSchema",
+    "AnalysisByPromptResponseSchema",
+]

@@ -1,9 +1,5 @@
-from pydantic import BaseModel
+from _common.schemas.specialist_finding import SpecialistFinding
 
+SpecialistFindingSchema = SpecialistFinding
 
-class SpecialistFindingSchema(BaseModel):
-    specialty: str
-    risks: str
-    treatment: str
-    prognosis: str
-    probable_diagnosis: str
+__all__ = ["SpecialistFinding", "SpecialistFindingSchema"]

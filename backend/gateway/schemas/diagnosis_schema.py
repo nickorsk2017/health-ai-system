@@ -1,8 +1,5 @@
-from pydantic import BaseModel
+from _common.schemas.gp_consultation import GPConsultation
 
+GPConsultationSchema = GPConsultation
 
-class GPConsultationSchema(BaseModel):
-    diagnosis: str
-    treatment: str
-    prognosis: str
-    summary: str
+__all__ = ["GPConsultation", "GPConsultationSchema"]

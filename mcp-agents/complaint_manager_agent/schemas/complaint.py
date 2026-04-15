@@ -1,9 +1,6 @@
-from datetime import date, datetime
-from typing import Literal
+from _common.models.complaint import ComplaintRecord, ComplaintStatus
 
 from pydantic import BaseModel, Field
-
-ComplaintStatus = Literal["unread", "read", "appointment"]
 
 
 class UpsertComplaintRequest(BaseModel):
@@ -29,15 +26,6 @@ class GetComplaintsRequest(BaseModel):
     )
 
 
-class ComplaintRecord(BaseModel):
-    complaint_id: str
-    user_id: str
-    problem_health: str
-    date_public: str
-    status: ComplaintStatus
-    created_at: str
-
-
 class MarkAsReadRequest(BaseModel):
     complaint_id: str = Field(description="UUID of the complaint to mark as read.")
 
@@ -52,3 +40,14 @@ class DeleteComplaintRequest(BaseModel):
 
 
 UpsertComplaintResponse.model_rebuild()
+
+__all__ = [
+    "ComplaintRecord",
+    "ComplaintStatus",
+    "UpsertComplaintRequest",
+    "UpsertComplaintResponse",
+    "GetComplaintsRequest",
+    "MarkAsReadRequest",
+    "MutateComplaintResponse",
+    "DeleteComplaintRequest",
+]

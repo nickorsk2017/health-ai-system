@@ -1,7 +1,7 @@
 from fastmcp import Client
 
 from config import settings
-from schemas.consilium_schema import SpecialistFindingSchema
+from _common.schemas.specialist_finding import SpecialistFinding as SpecialistFindingSchema
 from services.agent_result import AgentResult, to_response
 
 
