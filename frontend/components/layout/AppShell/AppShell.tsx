@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import MobileWarningModal from "@/components/common/MobileWarningModal/MobileWarningModal";
 import Spinner from "@/components/common/Spinner/Spinner";
 import PatientGuard from "@/components/features/patient/PatientGuard";
 import PatientOnboardingGuard from "@/components/features/patient/PatientOnboardingGuard";
@@ -11,6 +12,7 @@ import TopBar from "@/components/layout/TopBar/TopBar";
 import LoggedInPatientName from "@/components/features/patient/LoggedInPatientName";
 import PatientSelector from "@/components/features/patient/PatientSelector";
 import { RoleContext } from "@/contexts/RoleContext";
+import useMobileDetect from "@/hooks/useMobileDetect";
 
 const ROLE_KEY = "app_role";
 
@@ -19,6 +21,7 @@ type Props = {
 };
 
 export default function AppShell({ children }: Props) {
+  const isMobile = useMobileDetect();
   const [role, setRoleState] = useState<Entity.AppRole | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -37,6 +40,10 @@ export default function AppShell({ children }: Props) {
     localStorage.clear();
     setRoleState(null);
   };
+
+  if (isMobile) {
+    return <MobileWarningModal isOpen text="The Goal for this demo is sharing a system design skills" />;
+  }
 
   if (!mounted) {
     return (
