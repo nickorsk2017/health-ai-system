@@ -1,12 +1,14 @@
+MONOREPO_ROOT := $(realpath $(CURDIR)/../..)
+
 .PHONY: dev inspector kill-inspector inspector-docker build-docker
 
 dev:
 	make kill-port
-	uv run appointment-scheduler-agent
+	PYTHONPATH=$(MONOREPO_ROOT) uv run appointment-scheduler-agent
 
 inspector:
 	make kill-inspector
-	npx @modelcontextprotocol/inspector uv run appointment-scheduler-agent
+	PYTHONPATH=$(MONOREPO_ROOT) npx @modelcontextprotocol/inspector uv run appointment-scheduler-agent
 
 kill-inspector:
 	kill -9 $$(lsof -t -i :6274 -i :6277) 2>/dev/null || true

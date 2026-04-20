@@ -28,6 +28,7 @@ Rules:
 4. Multiple symptoms on the same date must be separate entries — do not merge them.
 5. Format date_public as ISO 8601 UTC datetime (e.g. "2026-04-20T00:00:00+00:00").
 6. Only extract what is explicitly stated. Do not invent or embellish.
+7. Group all symptoms and health concerns that occurred on the same calendar day into a single raw for that date.
 """
 
 

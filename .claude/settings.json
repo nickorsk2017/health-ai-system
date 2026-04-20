@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xargs ls *)"
+      "Bash(xargs ls *)",
+      "Bash(git commit -m ' *)",
+      "Bash(ls /Users/nickdev/www/health-assistant/mcp-agents/complaint_manager_agent/.venv/lib/python*/site-packages/)",
+      "Bash(ls /Users/nickdev/www/health-assistant/mcp-agents/appointment_scheduler_agent/.venv/lib/python*/site-packages/)",
+      "Bash(uv run *)",
+      "Bash(grep -rl \"from _common\" /Users/nickdev/www/health-assistant/mcp-agents/*/)",
+      "Bash(uv sync *)"
     ]
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ClipboardX, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { ClipboardX, Plus, RefreshCw, Sparkles, Trash2 } from "lucide-react";
 
 import Alert from "@/components/common/Alert/Alert";
 import Button from "@/components/common/Button/Button";
@@ -10,6 +10,7 @@ import AddComplaintModal from "@/components/features/complaints/AddComplaintModa
 import ComplaintDetailModal from "@/components/features/complaints/ComplaintDetailModal";
 import { useComplaintStore } from "@/stores/useComplaintStore";
 import formatDate from "@/utils/formatDate";
+import AddComplaintsByPromptModal from "./AddComplaintsByPromptModal";
 
 const STATUS_LABELS: Record<Entity.ComplaintStatus, string> = {
   unread: "Unread",
@@ -39,6 +40,8 @@ export default function ComplaintList({ userId, isDoctor = false }: Props) {
     clearFetchError,
   } = useComplaintStore();
 
+  const [modalComplaintPromptOpen, setModalComplaintPromptOpen] = useState(false);
+
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [selected, setSelected] = useState<Entity.Complaint | null>(null);
 
@@ -62,7 +65,7 @@ export default function ComplaintList({ userId, isDoctor = false }: Props) {
             {isDoctor ? "Review and schedule appointments" : "Track your health concerns"}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center  gap-2">
           <Button
             variant="secondary"
             size="sm"
@@ -72,11 +75,21 @@ export default function ComplaintList({ userId, isDoctor = false }: Props) {
             <RefreshCw className="h-3.5 w-3.5" />
             Refresh
           </Button>
-          {!isDoctor && (
-            <Button size="sm" onClick={() => setIsAddOpen(true)}>
-              <Plus className="h-3.5 w-3.5" />
-              Add Complaint
-            </Button>
+          {!isDoctor && (<>
+              <Button size="sm" onClick={() => setIsAddOpen(true)}>
+                <Plus className="h-3.5 w-3.5" />
+                Add Complaint
+              </Button>
+
+              <Button
+                type="button"
+                variant="special"
+                onClick={() => setModalComplaintPromptOpen(true)}
+              >
+                <Sparkles className="h-4 w-4" />
+                Add complaints by prompt
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -146,6 +159,17 @@ export default function ComplaintList({ userId, isDoctor = false }: Props) {
           isOpen={isAddOpen}
           userId={userId}
           onClose={() => setIsAddOpen(false)}
+        />
+      )}
+
+      {!isDoctor && (
+        <AddComplaintsByPromptModal
+          isOpen={modalComplaintPromptOpen}
+          userId={userId}
+          onClose={() => setModalComplaintPromptOpen(false)}
+          onSuccess={() => {
+            setModalComplaintPromptOpen(false);
+          }}
         />
       )}
 

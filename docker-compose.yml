@@ -94,7 +94,7 @@ services:
   client_history_agent:
     build:
       context: .
-      dockerfile: mcp-agents/patiant_history_agent/Dockerfile
+      dockerfile: mcp-agents/patient_history_agent/Dockerfile
     <<: *common
     depends_on:
       postgres:
