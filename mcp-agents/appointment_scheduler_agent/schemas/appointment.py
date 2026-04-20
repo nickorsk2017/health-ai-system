@@ -21,6 +21,10 @@ class CreateAppointmentResponse(BaseModel):
     success: bool
     appointment_id: str = ""
     error: str = ""
+    record: "AppointmentRecord | None" = None
+
+
+CreateAppointmentResponse.model_rebuild()
 
 
 __all__ = [

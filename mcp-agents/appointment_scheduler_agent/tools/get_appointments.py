@@ -35,7 +35,7 @@ async def get_appointments(request: GetAppointmentsRequest) -> list[AppointmentR
         AppointmentRecord(
             appointment_id=str(row.id),
             complaint_id=str(row.complaint_id),
-            user_id=row.user_id,
+            user_id=str(row.user_id),
             appointment_date=row.appointment_date.isoformat(),
             doctor_type=row.doctor_type,
             problem_notes=row.problem_notes,
