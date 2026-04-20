@@ -19,4 +19,9 @@ declare namespace Entity {
     problem_health: string;
     date_public: string;
   };
+
+  type ComplaintByPromptRequest = {
+    user_id: string;
+    prompt: string;
+  };
 }

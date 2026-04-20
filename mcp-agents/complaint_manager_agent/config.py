@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     postgres_host: str = "localhost"
     postgres_port: int = 5432
 
+    openai_api_key: str
+    openai_model: str = "gpt-4o-mini"
+
     mcp_port: int = 6341
     mcp_host: str = "0.0.0.0"
 

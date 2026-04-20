@@ -7,11 +7,13 @@ from loguru import logger
 from config import settings
 from db.init import create_tables
 from schemas.complaint import (
+    CreateComplaintsByPromptRequest,
     DeleteComplaintRequest,
     GetComplaintsRequest,
     MarkAsReadRequest,
     UpsertComplaintRequest,
 )
+from tools.create_complaints_from_prompt import create_complaints_by_prompt as _create_complaints_by_prompt
 from tools.delete_complaint import delete_complaint as _delete_complaint
 from tools.get_complaints import get_complaints as _get_complaints
 from tools.mark_as_read import mark_as_read as _mark_as_read
@@ -28,6 +30,18 @@ async def lifespan(server: FastMCP) -> AsyncIterator[None]:
 
 
 mcp = FastMCP("complaint-manager-agent", lifespan=lifespan)
+
+
+@mcp.tool(name="create_complaints_by_prompt")
+async def create_complaints_by_prompt(data: CreateComplaintsByPromptRequest) -> list[dict]:
+    """Parse a free-text patient description and create multiple complaint records.
+
+    Args:
+        user_id: UUID of the patient submitting the complaints.
+        prompt: Natural language description of health concerns with optional relative dates.
+    """
+    records = await _create_complaints_by_prompt(data)
+    return [r.model_dump() for r in records]
 
 
 @mcp.tool(name="upsert_complaint")

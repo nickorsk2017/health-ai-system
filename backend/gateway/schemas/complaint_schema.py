@@ -14,9 +14,15 @@ class UpsertComplaintSchema(BaseModel):
     date_public: datetime
 
 
+class ComplaintsByPromptRequestSchema(BaseModel):
+    user_id: str
+    prompt: str
+
+
 __all__ = [
     "ComplaintStatus",
     "ComplaintRecord",
     "ComplaintRecordSchema",
     "UpsertComplaintSchema",
+    "ComplaintsByPromptRequestSchema",
 ]

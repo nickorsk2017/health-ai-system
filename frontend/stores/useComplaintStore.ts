@@ -8,23 +8,29 @@ type State = {
   complaints: Entity.Complaint[];
   isFetching: boolean;
   isSubmitting: boolean;
+  isProcessingPrompt: boolean;
   fetchError: string | null;
   submitError: string | null;
+  promptError: string | null;
   fetchComplaints: (userId: string) => Promise<void>;
   createComplaint: (userId: string, form: Entity.CreateComplaint) => Promise<boolean>;
   updateComplaint: (complaintId: string, form: Entity.UpdateComplaint, userId: string) => Promise<boolean>;
   markRead: (complaintId: string, userId: string) => Promise<void>;
   removeComplaint: (complaintId: string, userId: string) => Promise<boolean>;
+  submitByPrompt: (data: Entity.ComplaintByPromptRequest) => Promise<boolean>;
   clearSubmitError: () => void;
   clearFetchError: () => void;
+  clearPromptError: () => void;
 };
 
 export const useComplaintStore = create<State>((set, get) => ({
   complaints: [],
   isFetching: false,
   isSubmitting: false,
+  isProcessingPrompt: false,
   fetchError: null,
   submitError: null,
+  promptError: null,
 
   fetchComplaints: async (userId) => {
     set({ isFetching: true, fetchError: null });
@@ -84,6 +90,20 @@ export const useComplaintStore = create<State>((set, get) => ({
     }
   },
 
+  submitByPrompt: async (data) => {
+    set({ isProcessingPrompt: true, promptError: null });
+    try {
+      await ComplaintService.createByPrompt(data);
+      await get().fetchComplaints(data.user_id);
+      set({ isProcessingPrompt: false });
+      return true;
+    } catch (err) {
+      set({ isProcessingPrompt: false, promptError: (err as Error).message });
+      return false;
+    }
+  },
+
   clearSubmitError: () => set({ submitError: null }),
   clearFetchError: () => set({ fetchError: null }),
+  clearPromptError: () => set({ promptError: null }),
 }));

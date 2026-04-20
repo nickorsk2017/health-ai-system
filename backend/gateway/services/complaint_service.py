@@ -3,7 +3,7 @@ from datetime import timezone
 from fastmcp import Client
 
 from config import settings
-from schemas.complaint_schema import ComplaintRecordSchema, UpsertComplaintSchema
+from schemas.complaint_schema import ComplaintRecordSchema, ComplaintsByPromptRequestSchema, UpsertComplaintSchema
 from services.agent_result import AgentResult, to_response
 
 
@@ -39,6 +39,22 @@ async def fetch_complaints(user_id: str) -> AgentResult:
             response = await client.call_tool(
                 "get_complaints",
                 {"data": {"user_id": user_id}},
+            )
+        response_content = response.structured_content
+        complaints_collection = (
+            response_content.get("result") if isinstance(response_content, dict) else None
+        )
+        return to_response(data=[ComplaintRecordSchema(**c) for c in complaints_collection])
+    except Exception as exc:
+        return to_response(error=str(exc))
+
+
+async def create_complaints_from_prompt(data: ComplaintsByPromptRequestSchema) -> AgentResult:
+    try:
+        async with Client(settings.complaint_manager_agent_url) as client:
+            response = await client.call_tool(
+                "create_complaints_by_prompt",
+                {"data": {"user_id": data.user_id, "prompt": data.prompt}},
             )
         response_content = response.structured_content
         complaints_collection = (

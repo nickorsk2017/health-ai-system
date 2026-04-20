@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException, Query
 
-from schemas.complaint_schema import UpsertComplaintSchema, ComplaintRecordSchema
+from schemas.complaint_schema import ComplaintsByPromptRequestSchema, ComplaintRecordSchema, UpsertComplaintSchema
 from services.complaint_service import (
+    create_complaints_from_prompt,
     fetch_complaints,
     mark_complaint_read,
     remove_complaint,
@@ -9,6 +10,14 @@ from services.complaint_service import (
 )
 
 router = APIRouter(prefix="/api/v1/complaints", tags=["complaints"])
+
+
+@router.post("/by-prompt", response_model=list[ComplaintRecordSchema], status_code=201)
+async def add_complaints_by_prompt(body: ComplaintsByPromptRequestSchema) -> list[ComplaintRecordSchema]:
+    agent_result = await create_complaints_from_prompt(body)
+    if not agent_result["success"]:
+        raise HTTPException(status_code=503, detail=agent_result["error"])
+    return agent_result["data"]
 
 
 @router.post("", status_code=201)

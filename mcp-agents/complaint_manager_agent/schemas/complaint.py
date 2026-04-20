@@ -41,6 +41,11 @@ class DeleteComplaintRequest(BaseModel):
     complaint_id: str = Field(description="UUID of the complaint to delete.")
 
 
+class CreateComplaintsByPromptRequest(BaseModel):
+    user_id: str = Field(description="UUID of the patient submitting complaints.")
+    prompt: str = Field(description="Free-text description of health concerns.")
+
+
 UpsertComplaintResponse.model_rebuild()
 
 __all__ = [
@@ -52,4 +57,5 @@ __all__ = [
     "MarkAsReadRequest",
     "MutateComplaintResponse",
     "DeleteComplaintRequest",
+    "CreateComplaintsByPromptRequest",
 ]

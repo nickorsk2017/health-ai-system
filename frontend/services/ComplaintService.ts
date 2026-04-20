@@ -24,6 +24,16 @@ export class ComplaintService {
     return res.json();
   }
 
+  static async createByPrompt(data: Entity.ComplaintByPromptRequest): Promise<Entity.Complaint[]> {
+    const res = await fetch(`${BASE}/by-prompt`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error(`ComplaintService.createByPrompt failed: ${res.status}`);
+    return res.json();
+  }
+
   static async update(
     complaintId: string,
     userId: string,
